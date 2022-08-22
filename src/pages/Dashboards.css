@@ -6,14 +6,15 @@
 .swiper-slide {
   text-align: center;
   font-size: 18px;
-  background: #fff;
-  background: #96d5ff;
+  /* background: #fff; */
+  background: #2d323e;
 
   /* Center slide text vertically */
   display: -webkit-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
+  flex-direction: column;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
@@ -31,20 +32,39 @@
   object-fit: cover;
 }
 
+.swiper-pagination {
+  bottom: 0px !important;
+  width: 110% !important;
+  height: var(--bottomNavHeight);
+  /* background-color: #ff0000; */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
 .swiper-pagination-bullet {
-  width: 20px;
-  height: 20px;
+  width: 85px;
+  height: 33px;
+  border-radius: 6px;
   text-align: center;
-  line-height: 20px;
+  line-height: 33px;
   font-size: 12px;
-  color: #000;
+  color: rgb(0, 0, 0);
   opacity: 1;
-  background: rgba(0, 0, 0, 0.2);
+  background: white;
+  transform: scale(1) !important;
+  transition: 0.15s;
+}
+
+.swiper-pagination-bullet:hover {
+  background-color: #00acff;
+  color: white;
 }
 
 .swiper-pagination-bullet-active {
-  color: #fff;
-  background: #007aff;
+  color: white;
+  background: var(--shual);
 }
 
 .dasboardsSwiper iframe {
@@ -53,9 +73,32 @@
   position: absolute;
   top: 0;
 }
+
+.swiper-button-prev {
+  /* bottom: -4px !important; */
+  right: -4px !important;
+}
+
+.swiper-button-next {
+  /* bottom: -4px !important; */
+  left: -4px !important;
+}
+
 .swiper-button-prev,
 .swiper-button-next {
   position: fixed;
-  bottom: 0%;
+  bottom: -4px !important;
   top: auto;
+  height: calc(var(--bottomNavHeight) * 1.2);
+  width: calc(var(--bottomNavHeight) * 1.2);
+  z-index: 20;
+  /* padding: 7px; */
+  transition: 0.1s;
+  transform: scale(0.8);
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background-color: var(--shual);
+  color: white;
 }

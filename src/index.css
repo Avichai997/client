@@ -1,5 +1,7 @@
 #root {
   height: 100%;
+  --shual: #039be5;
+  --bottomNavHeight: 45px;
 }
 html,
 body {
@@ -9,9 +11,30 @@ body {
 
 body {
   background: #eee;
-  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  color: white;
+  font-family: sans-serif;
   font-size: 14px;
-  color: #000;
   margin: 0;
   padding: 0;
+}
+
+/* sweetAlert2 CSS */
+.colored-toast.swal2-icon-error {
+  background-color: #f27474 !important;
+}
+
+.colored-toast .swal2-title {
+  color: white;
+}
+
+.colored-toast .swal2-close {
+  color: white;
+}
+.colored-toast .swal2-actions .swal2-confirm {
+  background: white;
+  color: black;
+}
+.colored-toast .swal2-container {
+  color: white;
+  background-color: #f27474 !important;
 }

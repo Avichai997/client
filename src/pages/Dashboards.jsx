@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Keyboard, Mousewheel } from 'swiper';
 
@@ -5,38 +6,60 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './Dashboards.css';
+import Slide from 'components/Slide';
 
 function Dashboards() {
+  const { status, data, error, isFetching } = useQuery(['dashboards']);
+
   return (
     <Swiper
-      // spaceBetween={50}
-      // slidesPerView={3}
       dir="rtl"
       grabCursor
       onSlideChange={() => console.log('slide change')}
       onSwiper={(swiper) => console.log(swiper)}
+      // watchSlidesProgress={true} // enable 'isVisible' <SwiperSlide> prop
       navigation
       loop
       mousewheel
+      keyboard
       pagination={{
         dynamicBullets: true,
         clickable: true,
         renderBullet: function (index, className) {
-          return '<span class="' + className + '">' + (index + 1) + '</span>';
+          return `<div class="${className}">שקופית ${+index + 1}</div>`;
         },
-      }}
-      keyboard={{
-        enabled: true,
       }}
       modules={[Navigation, Pagination, Keyboard, Mousewheel]}
       className="dasboardsSwiper"
     >
+      <SwiperSlide>Slide 1</SwiperSlide>
       <SwiperSlide>
-        <iframe src="https://go.co.il" title="example"></iframe>
+        <Slide url="https://portal.shual.org.il/portal/apps/sites/#/portal" />
       </SwiperSlide>
-      <SwiperSlide>Slide 2</SwiperSlide>
-      <SwiperSlide>Slide 3</SwiperSlide>
-      <SwiperSlide>Slide 4</SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
+      <SwiperSlide>
+        <Slide url="https://go.co.il" />
+      </SwiperSlide>
     </Swiper>
   );
 }
