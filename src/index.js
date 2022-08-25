@@ -64,6 +64,7 @@ const queryClient = new QueryClient({
       // refetchOnWindowFocus: true,
       // refetchInterval: false,
       // staleTime: Infinity,
+      // cacheTime: 300000, // 5 minutes default
     },
     mutations: {
       mutationFn: defaultMutationFn,
