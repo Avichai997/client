@@ -1,13 +1,34 @@
 import { useState, useEffect } from 'react';
-import { useSwiperSlide } from 'swiper/react';
+import { useSwiperSlide, useSwiper } from 'swiper/react';
 
-const Slide = ({ url }) => {
+const Slide = ({ url, reset, autoLoad, slideIndex, onReset }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const swiperSlide = useSwiperSlide();
+  const isActive = swiperSlide.isActive;
+  const swiper = useSwiper();
 
   useEffect(() => {
-    if (swiperSlide.isActive) setIsLoaded(true);
-  }, [swiperSlide.isActive]);
+    if (isActive) {
+      setIsLoaded(true);
+    } else if (reset) {
+      setIsLoaded(false);
+      onReset();
+    }
+  }, [swiper.activeIndex, isActive, reset]);
+
+  useEffect(() => {
+    if (autoLoad) {
+      setIsLoaded(true);
+    }
+  }, [autoLoad]);
+
+  // useEffect(() => {
+  //   if (isActive) {
+  //     setIsLoaded(true);
+  //   } else if (!autoLoad && !isActive && !isLoaded) {
+  //     setIsLoaded(false);
+  //   }
+  // }, [isActive, autoLoad, isLoaded]);
 
   return (
     <>
