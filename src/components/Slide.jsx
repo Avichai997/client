@@ -14,21 +14,13 @@ const Slide = ({ url, reset, autoLoad, slideIndex, onReset }) => {
       setIsLoaded(false);
       onReset();
     }
-  }, [swiper.activeIndex, isActive, reset]);
+  }, [swiper.activeIndex, isActive, reset, onReset]);
 
   useEffect(() => {
     if (autoLoad) {
       setIsLoaded(true);
     }
   }, [autoLoad]);
-
-  // useEffect(() => {
-  //   if (isActive) {
-  //     setIsLoaded(true);
-  //   } else if (!autoLoad && !isActive && !isLoaded) {
-  //     setIsLoaded(false);
-  //   }
-  // }, [isActive, autoLoad, isLoaded]);
 
   return (
     <>

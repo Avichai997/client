@@ -1,18 +1,40 @@
+import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import Dashboards from 'pages/Dashboards';
+import Loading from 'components/Loading';
+import Carousel from 'pages/Carousel';
 import Login from 'pages/Login';
 import NoMatch from 'pages/NoMatch';
-import Loading from 'components/Loading';
+
+import Admin from 'pages/Admin';
+import Users from 'pages/Users';
+import Messages from 'pages/Messages';
+import Analytics from 'pages/Analytics';
+import FileManager from 'pages/FileManager';
+import Order from 'pages/Order';
+import Saved from 'pages/Saved';
+import Setting from 'pages/Setting';
+import Dashboard from 'pages/Dashboard';
 
 function App() {
   return (
     <>
-    <Loading/>
-    <Routes>
-      <Route path="/" element={<Dashboards />} />
-      <Route path="Login" element={<Login />} />
-      <Route path="*" element={<NoMatch />} />
-    </Routes>
+      <Loading />
+      <Routes>
+        <Route path='/' element={<Carousel />} />
+        <Route path='/Login' element={<Login />} />
+        <Route path='/Admin/' element={<Admin />}>
+          <Route index element={<Dashboard />} />
+          <Route path='users' element={<Users />} />
+          <Route path='messages' element={<Messages />} />
+          <Route path='analytics' element={<Analytics />} />
+          <Route path='file-manager' element={<FileManager />} />
+          <Route path='order' element={<Order />} />
+          <Route path='saved' element={<Saved />} />
+          <Route path='settings' element={<Setting />} />
+        </Route>
+
+        <Route path='*' element={<NoMatch />} />
+      </Routes>
     </>
   );
 }

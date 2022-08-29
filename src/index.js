@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import './index.css';
+import './index.scss';
 import App from './App';
 
 const defaultQueryFn = async ({ queryKey }) => {

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import {  useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { CircularProgress, Backdrop, Typography } from '@mui/material';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 
@@ -13,14 +14,13 @@ const Loading = () => {
   }, [display]);
 
   const [open, setOpen] = useState(false);
+  
   const handleClose = () => {
     setOpen(false);
   };
-  const handleToggle = () => {
-    setOpen(!open);
-  };
 
   return (
+    ReactDOM.createPortal(
     <>
       <Backdrop
         sx={{ color: '#fff', zIndex: 9999, display: 'flex' }}
@@ -47,7 +47,9 @@ const Loading = () => {
           }}
         />
       </Backdrop>
-    </>
+    </>,
+    document.getElementById('loadingPortal')
+    )
   );
 };
 

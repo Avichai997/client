@@ -15,10 +15,10 @@ import {
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import './Dashboards.css';
+import './Carousel.css';
 
-function Dashboards() {
-  const { data: dashboards } = useDashboards();
+function Carousel() {
+  const { dashboards } = useDashboards();
 
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [autoLoad, setAutoLoad] = useState(false);
@@ -118,4 +118,4 @@ function Dashboards() {
   );
 }
 
-export default Dashboards;
+export default Carousel;
