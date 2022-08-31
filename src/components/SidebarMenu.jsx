@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExpandMore } from '@mui/icons-material';
+import { useParams, useLocation } from 'react-router-dom';
 
 const menuAnimation = {
   hidden: {
@@ -39,16 +40,26 @@ const menuItemAnimation = {
 
 const SidebarMenu = ({ route, showAnimation, isOpen, setIsOpen }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const params = useParams();
+  const location = useLocation();
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     setIsOpen(true);
   };
 
   useEffect(() => {
+    if (location.pathname.includes(route.path)) {
+      setIsMenuOpen(true);
+    }
+  }, [location.pathname, route.path]);
+
+  useEffect(() => {
     if (!isOpen) {
       setIsMenuOpen(false);
     }
   }, [isOpen]);
+
   return (
     <>
       <div className='menu' onClick={toggleMenu}>

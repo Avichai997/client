@@ -1,9 +1,20 @@
+import { Outlet } from 'react-router-dom';
+import Navbar from 'components/Navbar';
 import Sidebar from 'components/Sidebar';
+import './Admin.scss';
 
 const Admin = () => {
   return (
     <>
-      <Sidebar />;
+      <div className='admin_wrapper'>
+        <Sidebar />
+        <div className='container'>
+          <Navbar />
+          <div className="screenContainer">
+          <Outlet />
+          </div>
+        </div>
+      </div>
     </>
   );
 };

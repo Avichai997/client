@@ -1,0 +1,21 @@
+.admin_wrapper {
+  display: flex;
+  height: inherit;
+  overflow: hidden;
+
+  .container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .screenContainer {
+      padding: 20px;
+      display: flex;
+      flex: 1;
+    }
+  }
+
+  .title {
+    flex: 1;
+  }
+}

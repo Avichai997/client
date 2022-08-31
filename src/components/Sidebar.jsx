@@ -1,6 +1,6 @@
 import './Sidebar.scss';
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import SidebarMenu from 'components/SidebarMenu';
 import {
@@ -8,7 +8,6 @@ import {
   Person,
   Message,
   Analytics,
-  Folder,
   Lock,
   AttachMoney,
   ShoppingCart,
@@ -16,6 +15,9 @@ import {
   SettingsOutlined,
   Menu,
   Search,
+  AppRegistration,
+  People,
+  Dashboard,
 } from '@mui/icons-material';
 
 const routes = [
@@ -23,6 +25,28 @@ const routes = [
     path: '', // default path
     name: ' Dashboard',
     icon: <House />,
+  },
+  {
+    path: 'update',
+    name: 'ערוך מידע',
+    icon: <AppRegistration />,
+    subRoutes: [
+      {
+        path: 'update/users',
+        name: 'משתמשים ',
+        icon: <Person />,
+      },
+      {
+        path: 'update/dashboards',
+        name: 'דשבורדים',
+        icon: <Dashboard />,
+      },
+      {
+        path: 'update/types',
+        name: 'סוגי משתמשים',
+        icon: <People />,
+      },
+    ],
   },
   {
     path: 'users',
@@ -38,28 +62,6 @@ const routes = [
     path: 'analytics',
     name: 'Analytics',
     icon: <Analytics />,
-  },
-  {
-    path: 'file-manager',
-    name: 'File Manager',
-    icon: <Folder />,
-    subRoutes: [
-      {
-        path: 'settings/profile',
-        name: 'Profile ',
-        icon: <Person />,
-      },
-      {
-        path: 'settings/2fa',
-        name: '2FA',
-        icon: <Lock />,
-      },
-      {
-        path: 'settings/billing',
-        name: 'Billing',
-        icon: <AttachMoney />,
-      },
-    ],
   },
   {
     path: 'order',
@@ -99,6 +101,7 @@ const routes = [
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const toggle = () => setIsOpen(!isOpen);
+
   const inputAnimation = {
     hidden: {
       width: 0,
@@ -134,7 +137,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className='wrapper'>
+    <>
       <motion.div
         animate={{
           width: isOpen ? '200px' : '45px',
@@ -162,8 +165,6 @@ const Sidebar = () => {
           </AnimatePresence>
           <Menu onClick={toggle} className='bars' />
         </div>
-
-        
 
         <div className='search'>
           <AnimatePresence>
@@ -200,8 +201,8 @@ const Sidebar = () => {
                 end // = exact path
                 to={`${route.path}`}
                 key={index}
-                className='link'
-                activeClassName='active'
+                className={({ isActive }) => "link" + (isActive ? " active" : "")}
+
               >
                 <div className='icon'>{route.icon}</div>
                 <AnimatePresence>
@@ -221,10 +222,23 @@ const Sidebar = () => {
             );
           })}
         </section>
-      </motion.div>
 
-      <Outlet />
-    </div>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              variants={showAnimation}
+              initial='hidden'
+              animate='show'
+              exit='hidden'
+              className='bottom'
+            >
+              <div className='colorOption'></div>
+              <div className='colorOption'></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </>
   );
 };
 
