@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
+
 import './AgGrid.scss';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -7,71 +8,54 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 // import "ag-grid-community/styles/ag-theme-material.css";
 
 import { AG_GRID_LOCALE_HE } from './local.he';
-import { LicenseManager } from 'ag-grid-enterprise';
-LicenseManager.setLicenseKey(
-  '[TRIAL]_16_May_2020_[v2]_MTU4OTU4NzIwMDAwMA==b03f1f5b63303eabbc3b42a734fcc666'
-);
-
-class NodeIdRenderer {
-  init(params) {
-    this.eGui = document.createElement('div');
-    this.eGui.innerHTML = params.node.id;
-  }
-
-  getGui() {
-    return this.eGui;
-  }
-
-  refresh(params) {
-    return false;
-  }
-}
+import DoublingCellEditor from './DoublingCellEditor';
+import TextCellEditor from './TextCellEditor';
+import useWindowSize from 'hooks/useWindowsSize';
+// import { LicenseManager } from 'ag-grid-enterprise';
+// LicenseManager.setLicenseKey(
+//   '[TRIAL]_16_May_2020_[v2]_MTU4OTU4NzIwMDAwMA==b03f1f5b63303eabbc3b42a734fcc666'
+// );
 
 const AgGrid = () => {
+  const [gridApi, setGridApi] = useState();
+  const [windowWidth] = useWindowSize(150); // default debounce is 150ms
+  // const {width: containerWidth, ref} = useContainerWidth(debounce);
+  useEffect(() => {
+    if (gridApi) {
+      gridApi.sizeColumnsToFit();
+    }
+  }, [windowWidth, , gridApi]);
+
   const gridRef = useRef();
   const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
   const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
   const [rowData, setRowData] = useState();
   const [columnDefs, setColumnDefs] = useState([
     {
-      headerName: 'ID',
-      cellRenderer: NodeIdRenderer,
       headerCheckboxSelection: true, // show select All checkbox
       checkboxSelection: true,
       rowDrag: true,
-    },
-    {
-      field: 'athlete',
-      filterParams: { buttons: ['clear', 'reset', 'apply'] },
-    },
-    {
       field: 'age',
       filterParams: { buttons: ['apply', 'cancel'] },
       enablePivot: true,
+      cellEditor: DoublingCellEditor,
     },
-    { field: 'country' },
-    { field: 'year' },
-    { field: 'date' },
     {
-      field: 'sport',
-      // filter: "agMultiColumnFilter",
-      // filterParams: {
-      //   filters: [
-      //     {
-      //       filter: "agTextColumnFilter",
-      //       display: "accordion",
-      //     },
-      //     {
-      //       filter: "agSetColumnFilter",
-      //       display: "accordion",
-      //     },
-      //   ],
-      // },
+      field: 'athlete',
+      headerName: 'Name',
+      cellEditor: TextCellEditor,
+      filterParams: { buttons: ['clear', 'reset', 'apply'] },
     },
-    { field: 'gold' },
-    { field: 'silver' },
-    { field: 'bronze' },
-    { field: 'total' },
+    // { field: 'country' },
+    // { field: 'year' },
+    // { field: 'date' },
+    // {
+    //   field: 'sport',
+    // },
+    // { field: 'gold' },
+    // { field: 'silver' },
+    // { field: 'bronze' },
+    // { field: 'total' },
   ]);
 
   const localeText = useMemo(() => {
@@ -89,6 +73,7 @@ const AgGrid = () => {
       enableRowGroup: true,
       enablePivot: true,
       enableValue: true,
+      cellStyle: { height: '100%' },
     };
   }, []);
 
@@ -96,13 +81,19 @@ const AgGrid = () => {
     fetch('https://www.ag-grid.com/example-assets/olympic-winners.json')
       .then((resp) => resp.json())
       .then((data) => setRowData(data));
+
+    setGridApi(params.api);
   }, []);
 
   const onPageSizeChanged = useCallback(() => {
     var value = document.getElementById('page-size').value;
-    gridRef.current.api.paginationSetPageSize(Number(value));
+    gridApi.paginationSetPageSize(Number(value));
   }, []);
 
+  const onRowValueChanged = useCallback((event) => {
+    console.log(event.data);
+  }, []);
+  
   const statusBar = useMemo(() => {
     return {
       statusPanels: [
@@ -147,11 +138,14 @@ const AgGrid = () => {
           enableCharts={true}
           rowDragManaged={true} // row drag managed by ag-grid
           rowDragMultiRow={true}
-          // suppressMoveWhenRowDragging={false} // no animation on drag rows
+          suppressMoveWhenRowDragging={false} // no animation on drag rows
           animateRows={true}
           paginationPageSize={20}
           // paginationAutoPageSize={true}
           statusBar={statusBar}
+          rowHeight={70}
+          editType={'fullRow'}
+          onRowValueChanged={onRowValueChanged}
           onGridReady={onGridReady}
         ></AgGridReact>
       </div>
