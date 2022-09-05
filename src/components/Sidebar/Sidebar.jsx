@@ -2,22 +2,16 @@ import './Sidebar.scss';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import SidebarMenu from 'components/SidebarMenu';
+import SidebarMenu from 'components/Sidebar/SidebarMenu';
 import {
   House,
   Person,
-  Message,
-  Analytics,
-  Lock,
-  AttachMoney,
-  ShoppingCart,
-  Favorite,
-  SettingsOutlined,
   Menu,
   Search,
   AppRegistration,
   People,
   Dashboard,
+  SupportAgent,
 } from '@mui/icons-material';
 
 const routes = [
@@ -32,70 +26,75 @@ const routes = [
     icon: <AppRegistration />,
     subRoutes: [
       {
-        path: 'update/users',
-        name: 'משתמשים ',
-        icon: <Person />,
-      },
-      {
         path: 'update/dashboards',
         name: 'דשבורדים',
         icon: <Dashboard />,
       },
       {
         path: 'update/types',
-        name: 'סוגי משתמשים',
+        name: 'לקוחות',
+        icon: <SupportAgent />,
+      },
+      {
+        path: 'update/customers',
+        name: 'סוגי לקוחות',
         icon: <People />,
       },
-    ],
-  },
-  {
-    path: 'users',
-    name: 'Users',
-    icon: <Person />,
-  },
-  {
-    path: 'messages',
-    name: 'Messages',
-    icon: <Message />,
-  },
-  {
-    path: 'analytics',
-    name: 'Analytics',
-    icon: <Analytics />,
-  },
-  {
-    path: 'order',
-    name: 'Order',
-    icon: <ShoppingCart />,
-  },
-  {
-    path: 'settings',
-    name: 'Settings',
-    icon: <SettingsOutlined />,
-    exact: true,
-    subRoutes: [
       {
-        path: 'settings/profile',
-        name: 'Profile ',
+        path: 'update/users',
+        name: 'משתמשים',
         icon: <Person />,
       },
-      {
-        path: 'settings/2fa',
-        name: '2FA',
-        icon: <Lock />,
-      },
-      {
-        path: 'settings/billing',
-        name: 'Billing',
-        icon: <AttachMoney />,
-      },
     ],
   },
-  {
-    path: 'saved',
-    name: 'Saved',
-    icon: <Favorite />,
-  },
+  // {
+  //   path: 'users',
+  //   name: 'Users',
+  //   icon: <Person />,
+  // },
+  // {
+  //   path: 'messages',
+  //   name: 'Messages',
+  //   icon: <Message />,
+  // },
+  // {
+  //   path: 'analytics',
+  //   name: 'Analytics',
+  //   icon: <Analytics />,
+  // },
+  // {
+  //   path: 'order',
+  //   name: 'Order',
+  //   icon: <ShoppingCart />,
+  // },
+  // {
+  //   path: 'settings',
+  //   name: 'Settings',
+  //   icon: <SettingsOutlined />,
+  //   exact: true,
+  //   subRoutes: [
+  //     {
+  //       path: 'settings/profile',
+  //       name: 'Profile ',
+  //       icon: <Person />,
+  //     },
+  //     {
+  //       path: 'settings/2fa',
+  //       name: '2FA',
+  //       icon: <Lock />,
+  //     },
+  //     {
+  //       path: 'settings/billing',
+  //       name: 'Billing',
+  //       icon: <AttachMoney />,
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: 'saved',
+  //   name: 'Saved',
+  //   icon: <Favorite />,
+  // },
 ];
 
 const Sidebar = () => {
@@ -201,8 +200,9 @@ const Sidebar = () => {
                 end // = exact path
                 to={`${route.path}`}
                 key={index}
-                className={({ isActive }) => "link" + (isActive ? " active" : "")}
-
+                className={({ isActive }) =>
+                  'link' + (isActive ? ' active' : '')
+                }
               >
                 <div className='icon'>{route.icon}</div>
                 <AnimatePresence>

@@ -8,9 +8,9 @@ import Swal from 'sweetalert2';
 import './index.scss';
 import App from './App';
 
-const defaultQueryFn = async ({ queryKey }) => {
+const defaultQueryFn = async ({ queryKey: [path, params = ''] }) => {
   const { data } = await axios.get(
-    `${process.env.REACT_APP_API_URL}/${queryKey[0]}`
+    `${process.env.REACT_APP_API_URL}/${path}${params}`
   );
   return data;
 };

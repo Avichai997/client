@@ -30,11 +30,11 @@ export const AG_GRID_LOCALE_HE = {
   endsWith: 'Ends with',
 
   // Date Filter
-  dateFormatOoo: 'yyyy-mm-dd',
+  dateFormatOoo: 'dd-mm-yyyy',
 
   // Filter Conditions
-  andCondition: 'AND',
-  orCondition: 'OR',
+  andCondition: 'וגם',
+  orCondition: 'או',
 
   // Filter Buttons
   applyFilter: 'Apply',
@@ -55,7 +55,7 @@ export const AG_GRID_LOCALE_HE = {
   // columns tool panel
   pivotMode: 'Pivot Mode',
   groups: 'Row Groups',
-  rowGroupColumnsEmptyMessage: 'Drag here to set row groups',
+  rowGroupColumnsEmptyMessage: 'גרור עמודות לכאן כדי להגדיר קבוצות',
   values: 'Values',
   valueColumnsEmptyMessage: 'Drag here to aggregate',
   pivots: 'Column Labels',

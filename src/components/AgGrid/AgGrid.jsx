@@ -5,26 +5,39 @@ import './AgGrid.scss';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-// import "ag-grid-community/styles/ag-theme-material.css";
 
 import { AG_GRID_LOCALE_HE } from './local.he';
-import DoublingCellEditor from './DoublingCellEditor';
 import TextCellEditor from './TextCellEditor';
 import useWindowSize from 'hooks/useWindowsSize';
+import { useDashboards } from 'hooks/useDashboards';
+import MultipleSelect from 'components/MultipleSelect';
 // import { LicenseManager } from 'ag-grid-enterprise';
 // LicenseManager.setLicenseKey(
 //   '[TRIAL]_16_May_2020_[v2]_MTU4OTU4NzIwMDAwMA==b03f1f5b63303eabbc3b42a734fcc666'
 // );
 
 const AgGrid = () => {
+  const customerTypeId = '62ea79dbd152c7c170473ae0';
+  const { dashboards } = useDashboards({
+    params: '?sort=order&customerTypeId=62ea79dbd152c7c170473ae0',
+    options: { enabled: !!customerTypeId },
+  });
+
   const [gridApi, setGridApi] = useState();
   const [windowWidth] = useWindowSize(150); // default debounce is 150ms
-  // const {width: containerWidth, ref} = useContainerWidth(debounce);
+
   useEffect(() => {
     if (gridApi) {
       gridApi.sizeColumnsToFit();
     }
-  }, [windowWidth, , gridApi]);
+  }, [windowWidth, gridApi]);
+
+  useEffect(() => {
+    if (dashboards) {
+      console.log(dashboards);
+      setRowData(dashboards);
+    }
+  }, [dashboards]);
 
   const gridRef = useRef();
   const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
@@ -35,27 +48,42 @@ const AgGrid = () => {
       headerCheckboxSelection: true, // show select All checkbox
       checkboxSelection: true,
       rowDrag: true,
-      field: 'age',
+      field: 'order',
+      headerName: 'סדר',
       filterParams: { buttons: ['apply', 'cancel'] },
       enablePivot: true,
-      cellEditor: DoublingCellEditor,
+      cellEditor: TextCellEditor,
+      cellEditorParams: {
+        inputType: 'number',
+      },
     },
     {
-      field: 'athlete',
-      headerName: 'Name',
+      field: 'name',
+      headerName: 'שם',
       cellEditor: TextCellEditor,
-      filterParams: { buttons: ['clear', 'reset', 'apply'] },
+      cellEditorParams: {
+        inputType: 'text',
+        minLength: 3,
+        maxLength: 40,
+      },
+      filterParams: { buttons: ['clear', 'reset', 'apply', 'cancel'] },
     },
-    // { field: 'country' },
-    // { field: 'year' },
-    // { field: 'date' },
-    // {
-    //   field: 'sport',
-    // },
-    // { field: 'gold' },
-    // { field: 'silver' },
-    // { field: 'bronze' },
-    // { field: 'total' },
+    {
+      field: 'url',
+      headerName: 'כתובת URL',
+      cellEditor: TextCellEditor,
+      cellEditorParams: {
+        inputType: 'url',
+      },
+    },
+    {
+      field: 'includeShualCityId',
+      headerName: 'אפשר צפייה ללקוחות',
+    },
+    {
+      field: 'excludeShualCityId',
+      headerName: 'אפשר צפייה ללקוחות',
+    },
   ]);
 
   const localeText = useMemo(() => {
@@ -78,9 +106,9 @@ const AgGrid = () => {
   }, []);
 
   const onGridReady = useCallback((params) => {
-    fetch('https://www.ag-grid.com/example-assets/olympic-winners.json')
-      .then((resp) => resp.json())
-      .then((data) => setRowData(data));
+    // fetch('https://www.ag-grid.com/example-assets/olympic-winners.json')
+    //   .then((resp) => resp.json())
+    //   .then((data) => setRowData(data));
 
     setGridApi(params.api);
   }, []);
@@ -91,9 +119,9 @@ const AgGrid = () => {
   }, []);
 
   const onRowValueChanged = useCallback((event) => {
-    console.log(event.data);
+    console.log(event);
   }, []);
-  
+
   const statusBar = useMemo(() => {
     return {
       statusPanels: [
@@ -110,16 +138,16 @@ const AgGrid = () => {
     <div style={containerStyle}>
       <div className='example-header'>
         Page Size:
-        <select onChange={onPageSizeChanged} id='page-size'>
+        <select defaultValue={'20'} onChange={onPageSizeChanged} id='page-size'>
           <option value='10'>10</option>
-          <option value='20' selected={true}>
-            20
-          </option>
+          <option value='20'>20</option>
           <option value='50'>50</option>
           <option value='100'>100</option>
           <option value='200'>200</option>
         </select>
       </div>
+
+      <MultipleSelect label='בחר סוג לקוח:' options={['100', '101', '102']} />
 
       <div style={gridStyle} className='ag-theme-alpine'>
         <AgGridReact
@@ -143,9 +171,10 @@ const AgGrid = () => {
           paginationPageSize={20}
           // paginationAutoPageSize={true}
           statusBar={statusBar}
-          rowHeight={70}
+          rowHeight={80}
           editType={'fullRow'}
-          onRowValueChanged={onRowValueChanged}
+          // onRowValueChanged={onRowValueChanged}
+          rowEditingStopped={onRowValueChanged}
           onGridReady={onGridReady}
         ></AgGridReact>
       </div>
