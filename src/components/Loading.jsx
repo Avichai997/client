@@ -12,17 +12,16 @@ const Loading = () => {
   // }, [isFetching, isMutating]);
 
   // const [open, setOpen] = useState(false);
-  
+
   // const handleClose = () => {
   //   setOpen(false);
   // };
 
-  return (
-    ReactDOM.createPortal(
+  return ReactDOM.createPortal(
     <>
       <Backdrop
         sx={{ color: '#fff', zIndex: 9999, display: 'flex' }}
-        open={isFetching || isMutating}
+        open={!!(isFetching || isMutating)}
         // onClick={handleClose}
       >
         <Typography
@@ -38,7 +37,7 @@ const Loading = () => {
           טוען
         </Typography>
         <CircularProgress
-          color="inherit"
+          color='inherit'
           sx={{
             background: 'rgba(0,0,0,0.5)',
             borderRadius: '50%',
@@ -47,7 +46,6 @@ const Loading = () => {
       </Backdrop>
     </>,
     document.getElementById('loadingPortal')
-    )
   );
 };
 

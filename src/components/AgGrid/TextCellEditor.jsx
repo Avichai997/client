@@ -29,7 +29,9 @@ const TextEditor = memo(
 
     const schema = {};
     schema[inputType] = validationOptions[inputType];
-
+    //  schema = {
+      // url: Yup.string().url('כתובת URL לא תקינה').required(requiredMessage),
+    // }
     const validationSchema = Yup.object().shape(schema);
 
     /* Component Editor Lifecycle methods */
