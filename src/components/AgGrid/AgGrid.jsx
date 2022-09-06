@@ -1,26 +1,25 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { AgGridReact } from 'ag-grid-react';
 
 import './AgGrid.scss';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-
+import { AgGridReact } from 'ag-grid-react';
 import { AG_GRID_LOCALE_HE } from './local.he';
+
 import TextCellEditor from './TextCellEditor';
 import useWindowSize from 'hooks/useWindowsSize';
-import { useDashboards } from 'hooks/useDashboards';
 import MultipleSelect from 'components/MultipleSelect';
-// import { LicenseManager } from 'ag-grid-enterprise';
-// LicenseManager.setLicenseKey(
-//   '[TRIAL]_16_May_2020_[v2]_MTU4OTU4NzIwMDAwMA==b03f1f5b63303eabbc3b42a734fcc666'
-// );
+import { useDashboards } from 'hooks/useDashboards';
+import { useCustomersTypes } from 'hooks/useCustomersTypes';
 
 const AgGrid = () => {
-  const customerTypeId = '62ea79dbd152c7c170473ae0';
+  const { customersTypes } = useCustomersTypes({
+    params: '?sort=shualCityId',
+  });
   const { dashboards } = useDashboards({
     params: '?sort=order&customerTypeId=62ea79dbd152c7c170473ae0',
-    options: { enabled: !!customerTypeId },
+    options: { enabled: !!customersTypes },
   });
 
   const [gridApi, setGridApi] = useState();
@@ -34,7 +33,7 @@ const AgGrid = () => {
 
   useEffect(() => {
     if (dashboards) {
-      console.log(dashboards);
+      // console.log(dashboards);
       setRowData(dashboards);
     }
   }, [dashboards]);
@@ -46,7 +45,7 @@ const AgGrid = () => {
   const [columnDefs, setColumnDefs] = useState([
     {
       headerCheckboxSelection: true, // show select All checkbox
-      checkboxSelection: true,
+      checkboxSelection: true, // allow checkbox
       rowDrag: true,
       field: 'order',
       headerName: 'סדר',
@@ -82,7 +81,16 @@ const AgGrid = () => {
     },
     {
       field: 'excludeShualCityId',
-      headerName: 'אפשר צפייה ללקוחות',
+      headerName: 'מנע צפייה מלקוחות',
+    },
+    {
+      field: 'customerTypeId',
+      headerName: 'סוג לקוח',
+      // valueGetter: 
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'עדכון אחרון',
     },
   ]);
 
@@ -106,10 +114,6 @@ const AgGrid = () => {
   }, []);
 
   const onGridReady = useCallback((params) => {
-    // fetch('https://www.ag-grid.com/example-assets/olympic-winners.json')
-    //   .then((resp) => resp.json())
-    //   .then((data) => setRowData(data));
-
     setGridApi(params.api);
   }, []);
 
@@ -147,7 +151,9 @@ const AgGrid = () => {
         </select>
       </div>
 
-      <MultipleSelect label='בחר סוג לקוח:' options={['100', '101', '102']} />
+      {customersTypes && (
+        <MultipleSelect label='בחר סוג לקוח:' options={customersTypes} />
+      )}
 
       <div style={gridStyle} className='ag-theme-alpine'>
         <AgGridReact

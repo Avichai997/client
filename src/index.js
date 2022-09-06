@@ -26,9 +26,9 @@ const defaultMutationFn = async ({ method, path, data }) => {
 
 async function queryErrorHandler(error) {
   // error is type unknown because in js, anything can be an error (e.g. throw(5))
-  let title = error instanceof Error ? error.message : 'שגיאה בהתחברות לשרת';
-  if (title === 'Request failed with status code 404')
-    title = 'שגיאה בהתחברות לשרת';
+  let errorMsg = error instanceof Error ? error.message : 'שגיאה בהתחברות לשרת';
+  if (errorMsg === 'Request failed with status code 404')
+    errorMsg = 'שגיאה בהתחברות לשרת';
 
   const Toast = Swal.mixin({
     toast: true,
@@ -50,7 +50,7 @@ async function queryErrorHandler(error) {
   });
 
   await Toast.fire({
-    title,
+    title: errorMsg,
     icon: 'error',
   });
 }
@@ -60,9 +60,9 @@ const queryClient = new QueryClient({
     queries: {
       queryFn: defaultQueryFn,
       onError: queryErrorHandler,
-      // refetchOnReconnect: true,
+      // refetchOnReconnect: true, // on reconnect internet
       // refetchOnWindowFocus: true,
-      // refetchInterval: false,
+      // refetchInterval: false, // refetch again after every millisecond
       // staleTime: Infinity,
       // cacheTime: 300000, // 5 minutes default
     },

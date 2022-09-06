@@ -1,4 +1,4 @@
-import {  useState, useEffect } from 'react';
+// import {  useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { CircularProgress, Backdrop, Typography } from '@mui/material';
 import { useIsFetching, useIsMutating } from '@tanstack/react-query';
@@ -6,26 +6,24 @@ import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 const Loading = () => {
   const isFetching = useIsFetching();
   const isMutating = useIsMutating();
-  const display = isFetching || isMutating ? true : false;
 
-  useEffect(() => {
-    if (display) setOpen(true);
-    else setOpen(false);
-  }, [display]);
+  // useEffect(() => {
+  //   setOpen(isFetching || isMutating ? true : false);
+  // }, [isFetching, isMutating]);
 
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
 
   return (
     ReactDOM.createPortal(
     <>
       <Backdrop
         sx={{ color: '#fff', zIndex: 9999, display: 'flex' }}
-        open={open}
-        onClick={handleClose}
+        open={isFetching || isMutating}
+        // onClick={handleClose}
       >
         <Typography
           sx={{
