@@ -10,8 +10,8 @@ const Admin = () => {
         <Sidebar />
         <div className='container'>
           <Navbar />
-          <div className="screenContainer">
-          <Outlet />
+          <div className='screenContainer'>
+            <Outlet />
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ const useWindowSize = (debounce = 100) => {
     updateSize();
     return () => window.removeEventListener('resize', updateSize);
   }, []);
-  
+
   return debounceSize;
 };
 

@@ -1,33 +1,33 @@
 export const AG_GRID_LOCALE_HE = {
   // Set Filter
-  selectAll: '(Select All)',
-  selectAllSearchResults: '(Select All Search Results)',
-  searchOoo: 'Search...',
-  blanks: '(Blanks)',
-  noMatches: 'No matches',
+  selectAll: '(בחר הכל)',
+  selectAllSearchResults: '(בחר את כל תוצאות החיפוש)',
+  searchOoo: 'מחפש...',
+  blanks: '(ריקים)',
+  noMatches: 'אין התאמה',
 
   // Number Filter & Text Filter
-  filterOoo: 'Filter...',
-  equals: 'Equals',
-  notEqual: 'Not equal',
-  blank: 'Blank',
-  notBlank: 'Not blank',
-  empty: 'Choose One',
+  filterOoo: 'מסנן...',
+  equals: 'שווה',
+  notEqual: 'לא שווה',
+  blank: 'ריק',
+  notBlank: 'לא ריק',
+  empty: 'בחר אחד',
 
   // Number Filter
-  lessThan: 'Less than',
-  greaterThan: 'Greater than',
-  lessThanOrEqual: 'Less than or equal',
-  greaterThanOrEqual: 'Greater than or equal',
-  inRange: 'In range',
-  inRangeStart: 'from',
-  inRangeEnd: 'to',
+  lessThan: 'קטן מ',
+  greaterThan: 'גדול מ',
+  lessThanOrEqual: 'קטן מהערך או שווה לו',
+  greaterThanOrEqual: 'גדול מהערך או שווה לו',
+  inRange: 'בטווח',
+  inRangeStart: 'מ-',
+  inRangeEnd: 'עד-',
 
   // Text Filter
-  contains: 'Contains',
-  notContains: 'Not contains',
-  startsWith: 'Starts with',
-  endsWith: 'Ends with',
+  contains: 'מכיל',
+  notContains: 'לא מכיל',
+  startsWith: 'מתחיל ב',
+  endsWith: 'מסתיים ב',
 
   // Date Filter
   dateFormatOoo: 'dd-mm-yyyy',
@@ -37,10 +37,10 @@ export const AG_GRID_LOCALE_HE = {
   orCondition: 'או',
 
   // Filter Buttons
-  applyFilter: 'Apply',
-  resetFilter: 'Reset',
-  clearFilter: 'Clear',
-  cancelFilter: 'Cancel',
+  applyFilter: 'אישור',
+  resetFilter: 'איפוס',
+  clearFilter: 'נקה',
+  cancelFilter: 'בטל שינויים',
 
   // Filter Titles
   textFilter: 'Text Filter',
@@ -49,8 +49,8 @@ export const AG_GRID_LOCALE_HE = {
   setFilter: 'Set Filter',
 
   // Side Bar
-  columns: 'Columns',
-  filters: 'Filters',
+  columns: 'עמודות',
+  filters: 'סינון',
 
   // columns tool panel
   pivotMode: 'Pivot Mode',
@@ -65,11 +65,11 @@ export const AG_GRID_LOCALE_HE = {
   group: 'Group',
 
   // Row Drag
-  rowDragRows: 'rows',
+  rowDragRows: 'שורות',
 
   // Other
-  loadingOoo: 'Loading...',
-  noRowsToShow: 'No Rows To Show',
+  loadingOoo: 'טוען...',
+  noRowsToShow: 'אין רשומות להצגה',
   enabled: 'Enabled',
 
   // Menu

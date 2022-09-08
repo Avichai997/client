@@ -30,7 +30,7 @@ const TextEditor = memo(
     const schema = {};
     schema[inputType] = validationOptions[inputType];
     //  schema = {
-      // url: Yup.string().url('כתובת URL לא תקינה').required(requiredMessage),
+    // url: Yup.string().url('כתובת URL לא תקינה').required(requiredMessage),
     // }
     const validationSchema = Yup.object().shape(schema);
 
@@ -48,10 +48,19 @@ const TextEditor = memo(
           return false;
         },
         // Gets called once when editing is finished (eg if Enter is pressed).
-        // If you return true, then the result of the edit will be ignored.
         isCancelAfterEnd() {
-          // our editor will reject any value shortet then 6 chars
-          return !formikRef.current.isValid;
+          // our editor will reject any value formik didn't validate
+          const {isValid} = formikRef.current;
+          // if (!isValid) {
+          //   ref.current.api.startEditingCell({
+          //     rowIndex: 0,
+          //     colKey: 'name'
+          //   });
+          //   return;
+          // }
+          // If you return true, then the edit will be ignored. (!false)
+          // If you return false, then the edit will be saved. (!true)
+          return !isValid;
         },
       };
     });
@@ -78,6 +87,7 @@ const TextEditor = memo(
                   }
                   helperText={<ErrorMessage name={inputType} />}
                   required
+                  autoFocus
                   margin='normal'
                   type={inputType}
                   autoComplete={inputType}

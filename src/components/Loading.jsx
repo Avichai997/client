@@ -7,22 +7,18 @@ const Loading = () => {
   const isFetching = useIsFetching();
   const isMutating = useIsMutating();
 
-  // useEffect(() => {
-  //   setOpen(isFetching || isMutating ? true : false);
-  // }, [isFetching, isMutating]);
-
-  // const [open, setOpen] = useState(false);
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
   return ReactDOM.createPortal(
     <>
       <Backdrop
-        sx={{ color: '#fff', zIndex: 9999, display: 'flex' }}
-        open={!!(isFetching || isMutating)}
-        // onClick={handleClose}
+        sx={{
+          color: '#fff',
+          zIndex: 9999,
+          background: 'transparent',
+          display: 'flex',
+          // opacity: '0.1 !important'
+        }}
+        // open={!!(isFetching || isMutating)}
+        open={true}
       >
         <Typography
           sx={{
@@ -39,8 +35,11 @@ const Loading = () => {
         <CircularProgress
           color='inherit'
           sx={{
-            background: 'rgba(0,0,0,0.5)',
+            background: '#7451f8c2',
             borderRadius: '50%',
+            padding: '5px',
+            height: '55px !important',
+            width: '55px !important'
           }}
         />
       </Backdrop>
