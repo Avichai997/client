@@ -14,17 +14,34 @@ import MultipleSelect from 'components/MultipleSelect';
 import { useDashboards } from 'hooks/useDashboards';
 import { useCustomersTypes } from 'hooks/useCustomersTypes';
 import { ToastConfirmDialog, ToastError } from 'components/Toasts';
+import { Box, Tooltip, IconButton } from '@mui/material';
+import { Add } from '@mui/icons-material';
+import SelectBox from './SelectBox';
+import { useCustomers } from 'hooks/useCustomers';
+import CustomersSelectCellEditor from './CustomersSelectCellEditor';
+
+let sortActive = false;
+let filterActive = false;
 
 const AgGrid = () => {
   const gridRef = useRef(null);
   // default debounce is 150ms
-  const [windowWidth] = useWindowSize(150);
+  // const [windowWidth] = useWindowSize(150);
   const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
   const [rowData, setRowData] = useState();
+  const [showPinnedRow, setShowPinnedRow] = useState(false);
   const [inputRow, setInputRow] = useState({});
   const [columnDefs, setColumnDefs] = useState([]);
 
+  const toggleShowPinnedRow = () => {
+    setShowPinnedRow((prevState) => !prevState);
+  };
+
   const { customersTypes } = useCustomersTypes({
+    params: '?sort=-name',
+  });
+
+  const { customers } = useCustomers({
     params: '?sort=shualCityId',
   });
 
@@ -33,26 +50,54 @@ const AgGrid = () => {
     options: { enabled: !!customersTypes },
   });
 
+  const filteredCustomers = useMemo(() => {
+    if (!customers) return;
+
+    return customers.map((customer) => {
+      const { name, shualCityId, logo } = customer;
+      return {
+        name,
+        shualCityId,
+        logo,
+      };
+    });
+  }, [customers]);
+
   const dateValueGetter = (params) => {
     // return date in format '21.8.2022, 10:08:01'
     const colName = params.colDef.field;
-    return new Date(`${params.data[colName]}`).toLocaleString();
+    return new Date(`${params.data?.[colName]}`).toLocaleString();
   };
 
   const customerTypeValueGetter = (params) => {
     const colName = params.colDef.field;
-    const colCustomerTypeId = params.data[colName];
+    const colCustomerTypeId = params.data?.[colName];
     return customersTypes?.find((type) => type.id === colCustomerTypeId)?.name;
+  };
+
+  const customersRenderer = (params) => {
+    if (!customers) return;
+    const colName = params.colDef.field; // excludeShualCityId || includeShualCityId
+    const colData = params.data?.[colName];
+
+    let results = [];
+    for (let index in colData) {
+      const customerName = customers.find(
+        (customer) => customer.shualCityId === colData[index]
+      )?.name;
+      customerName && results.push(customerName);
+    }
+    return <span>{results.join(', ')}</span>;
   };
 
   const columns = [
     {
+      rowDrag: true,
+      enablePivot: true,
       headerCheckboxSelection: true, // show select All checkbox
       checkboxSelection: true, // allow checkbox
-      rowDrag: true,
       field: 'order',
       headerName: 'סדר',
-      enablePivot: true,
       editable: false,
       cellEditorParams: {
         inputType: 'number',
@@ -79,10 +124,25 @@ const AgGrid = () => {
     {
       field: 'includeShualCityId',
       headerName: 'אפשר צפייה ללקוחות',
+      cellRenderer: customersRenderer,
+      cellEditor: CustomersSelectCellEditor,
+      cellEditorPopup: true,
+      // cellEditorPopupPosition: 'under',
+      cellEditorParams: {
+        options: filteredCustomers,
+        limitTags: 2,
+      },
     },
     {
       field: 'excludeShualCityId',
       headerName: 'מנע צפייה מלקוחות',
+      cellRenderer: customersRenderer,
+      cellEditor: CustomersSelectCellEditor,
+      cellEditorPopup: true,
+      cellEditorParams: {
+        options: filteredCustomers,
+        limitTags: 2,
+      },
     },
     {
       field: 'customerTypeId',
@@ -103,13 +163,11 @@ const AgGrid = () => {
       minWidth: 110,
       maxWidth: 110,
       cellRendererSelector: (params) => {
-        if (isPinnedRow(params)) {
-          return undefined;
-        } else {
-          return {
-            component: ActionCellRenderer,
-          };
-        }
+        return isPinnedRow(params)
+          ? undefined
+          : {
+              component: ActionCellRenderer,
+            };
       },
       editable: false,
       colId: 'action',
@@ -119,22 +177,25 @@ const AgGrid = () => {
     },
   ];
 
-  const autoSizeAll = useCallback((skipHeader) => {
-    const allColumnIds = [];
-    gridRef.current.columnApi?.getColumns().forEach((column) => {
-      allColumnIds.push(column.getId());
-    });
-    gridRef.current.columnApi?.autoSizeColumns(allColumnIds, skipHeader);
-  }, []);
+  // const autoSizeAll = useCallback((skipHeader) => {
+  //   const allColumnIds = [];
+  //   gridRef.current.columnApi?.getColumns().forEach((column) => {
+  //     allColumnIds.push(column.getId());
+  //   });
+  //   gridRef.current.columnApi?.autoSizeColumns(allColumnIds, skipHeader);
+  // }, []);
 
-  const adjustGridSize = useCallback(() => {
-    if (windowWidth > 1500) gridRef.current.api.sizeColumnsToFit();
-    else autoSizeAll();
-  }, [windowWidth, autoSizeAll]);
+  // const adjustGridSize = useCallback(() => {
+  //   if (windowWidth > 1500) {
+  //     gridRef.current.api?.sizeColumnsToFit();
+  //   } else {
+  //     autoSizeAll();
+  //   }
+  // }, [windowWidth, autoSizeAll]);
 
-  useEffect(() => {
-    adjustGridSize();
-  }, [windowWidth, adjustGridSize]);
+  // useEffect(() => {
+  //   adjustGridSize();
+  // }, [windowWidth, adjustGridSize]);
 
   useEffect(() => {
     if (dashboards) {
@@ -143,10 +204,10 @@ const AgGrid = () => {
   }, [dashboards]);
 
   useEffect(() => {
-    if (customersTypes) {
+    if (customersTypes && filteredCustomers) {
       setColumnDefs(columns);
     }
-  }, [customersTypes, setColumnDefs]);
+  }, [customersTypes, filteredCustomers, setColumnDefs]);
 
   const localeText = useMemo(() => {
     return AG_GRID_LOCALE_HE;
@@ -165,13 +226,6 @@ const AgGrid = () => {
     }
     return undefined;
   };
-
-  function isPinnedRowDataCompleted(params) {
-    if (!isPinnedRow(params)) return;
-    return columnDefs.every((def) =>
-      def.editable ? inputRow[def.field] : true
-    );
-  }
 
   const defaultColDef = useMemo(() => {
     return {
@@ -196,26 +250,20 @@ const AgGrid = () => {
 
   const onGridReady = useCallback((params) => {}, []);
 
-  // const onPageSizeChanged = useCallback(() => {
-  //   const value = document.getElementById('page-size').value;
-  //   gridRef.current.paginationSetPageSize(Number(value));
-  // }, []);
-
-  // const onRowSelected = useCallback((event) => {
-  //   console.log(event);
-  // }, []);
+  const onRowSelected = useCallback((event) => {}, []);
 
   const onCellEditingStopped = useCallback(
     (params) => {
       if (!isPinnedRow(params)) return;
+
       const allDataFilled = columnDefs.every((def) =>
         def.editable === false ? true : inputRow[def.field]
       );
       if (allDataFilled) {
         setRowData([...rowData, inputRow]);
         setInputRow({});
-      }
-      else {
+        toggleShowPinnedRow();
+      } else {
         ToastError('לא כל השדות מולאו, הרשומה לא נשמרה.');
       }
     },
@@ -296,57 +344,146 @@ const AgGrid = () => {
     };
   }, []);
 
+  // suppress row drag if either sort or filter is active
+  const handleSuppressRowDrag = useCallback(() => {
+    const suppressRowDrag = sortActive || filterActive;
+    console.log(
+      `sortActive = ${sortActive}, filterActive = ${filterActive}, allowRowDrag = ${suppressRowDrag}`
+    );
+    gridRef.current.api.setSuppressRowDrag(suppressRowDrag);
+  }, []);
+
+  // listen for change on sort changed
+  const onSortChanged = useCallback(() => {
+    const colState = gridRef.current.columnApi.getColumnState() || [];
+    sortActive = colState.some((c) => c.sort);
+    handleSuppressRowDrag();
+  }, []);
+
+  // listen for changes on filter changed
+  const onFilterChanged = useCallback(() => {
+    filterActive = gridRef.current.api.isAnyFilterPresent();
+    handleSuppressRowDrag();
+  }, []);
+
+  const onRowDragMove = useCallback(
+    (event) => {
+      const movingNode = event.node;
+      const overNode = event.overNode;
+      if (!overNode) {
+        console.log(overNode)
+        return;
+      }
+      const rowNeedsToMove = movingNode !== overNode;
+      if (rowNeedsToMove) {
+        // the list of rows we have is data, not row nodes, so extract the data
+        const movingData = movingNode.data;
+        const overData = overNode.data;
+        const fromIndex = rowData.indexOf(movingData);
+        const toIndex = rowData.indexOf(overData);
+        const newStore = rowData.slice();
+        moveInArray(newStore, fromIndex, toIndex);
+        // rowData = newStore;
+        setRowData(newStore);
+        gridRef.current.api.clearFocusedCell();
+      }
+      function moveInArray(arr, fromIndex, toIndex) {
+        const element = arr[fromIndex];
+        arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, element);
+      }
+    },
+    [rowData]
+  );
+
+  const getRowId = useCallback((params) => {
+    return params.data.id;
+  }, []);
+
   return (
     <>
-      {/* <div className='example-header'>
-        Page Size:
-        <select defaultValue={'20'} onChange={onPageSizeChanged} id='page-size'>
-        <option value='10'>10</option>
-        <option value='20'>20</option>
-        <option value='50'>50</option>
-        <option value='100'>100</option>
-        <option value='200'>200</option>
-        </select>
-      </div> */}
-      {customersTypes && (
-        <MultipleSelect label='בחר סוג לקוח:' options={customersTypes} />
-      )}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          m: 1,
+        }}
+      >
+        {customersTypes && (
+          <MultipleSelect
+            label='הצג דשבורדים של לקוחות:'
+            options={customersTypes}
+            limitTags={3}
+          />
+        )}
+
+        <Box sx={{ display: 'flex' }}>
+          <SelectBox
+            label='מספר רשומות להצגה'
+            options={[10, 20, 30, 50, 100]}
+            gridRef={gridRef}
+          />
+
+          <Tooltip title='הוסף רשומה'>
+            <IconButton onClick={toggleShowPinnedRow}>
+              <Add />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Box>
+
       <div style={gridStyle} className='ag-theme-alpine'>
         <AgGridReact
+          // grid properties
           ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          localeText={localeText}
-          enableRtl={true}
           // sideBar={true}
           rowGroupPanelShow={'always'}
-          // pagination={true}
           enableRangeSelection={true}
           rowSelection={'multiple'}
           suppressRowClickSelection={true}
           enableCharts={true}
-          rowDragManaged={true} // row drag managed by ag-grid
-          rowDragMultiRow={true}
-          suppressMoveWhenRowDragging={false} // no animation on drag rows
+          // Style
+          localeText={localeText}
+          enableRtl={true}
           animateRows={true}
-          paginationPageSize={20}
-          // paginationAutoPageSize={true}
-          statusBar={statusBar}
           rowHeight={80}
           getRowStyle={getRowStyle}
+          // Editing
           editType={'fullRow'}
-          // onRowValueChanged={onRowValueChanged}
-          // onRowSelected={onRowSelected}
-          onCellEditingStopped={onCellEditingStopped}
-          // suppressCellFocus={true} // supress keyboard navigation
-          // onCellFocused={onCellFocused}
-          // suppressClickEdit={true}
-          // onCellFocused={onCellFocused}
-          onCellClicked={onCellClicked}
+          pinnedTopRowData={showPinnedRow ? [inputRow] : []}
           onRowEditingStopped={onRowEditingStopped}
           onRowEditingStarted={onRowEditingStarted}
-          pinnedTopRowData={[inputRow]}
+          onCellClicked={onCellClicked}
+          onCellEditingStopped={onCellEditingStopped}
+          // suppressClickEdit={true} // disable double/single click to edit a row
+
+          // Dragging
+          rowDragManaged={false} // row drag managed by ag-grid. dragging won't work with pagination' filtering' sorting etc...
+          rowDragMultiRow={true} // enable row dragging and multi-row dragging
+          // suppressRowDrag={true} // prevent row dragging when sorting or filtering is active
+          // suppressMoveWhenRowDragging={false} // false = play animation on drag rows
+          onSortChanged={onSortChanged}
+          onFilterChanged={onFilterChanged}
+          onRowDragMove={onRowDragMove}
+          getRowId={getRowId}
+          // pagination
+          pagination={true}
+          paginationPageSize={10}
+          // paginationAutoPageSize={true} // display number of viewed rows auto
+
+          statusBar={statusBar}
+          // onRowValueChanged={onRowValueChanged}
+          // suppressCellFocus={true} // supress keyboard navigation
+          // onCellFocused={onCellFocused}
+          // onCellFocused={onCellFocused}
+
+          // Selection
+          // onRowSelected={onRowSelected}
+
           onGridReady={onGridReady}
         ></AgGridReact>
       </div>

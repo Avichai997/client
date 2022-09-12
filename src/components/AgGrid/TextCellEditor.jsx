@@ -87,7 +87,7 @@ const TextEditor = memo(
                   }
                   helperText={<ErrorMessage name={inputType} />}
                   required
-                  autoFocus
+                  // autoFocus
                   margin='normal'
                   type={inputType}
                   autoComplete={inputType}

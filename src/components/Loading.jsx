@@ -15,10 +15,8 @@ const Loading = () => {
           zIndex: 9999,
           background: 'transparent',
           display: 'flex',
-          // opacity: '0.1 !important'
         }}
-        // open={!!(isFetching || isMutating)}
-        open={true}
+        open={!!(isFetching || isMutating)}
       >
         <Typography
           sx={{
@@ -35,7 +33,7 @@ const Loading = () => {
         <CircularProgress
           color='inherit'
           sx={{
-            background: '#7451f8c2',
+            background: '#9e9e9e',
             borderRadius: '50%',
             padding: '5px',
             height: '55px !important',
