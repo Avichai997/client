@@ -7,7 +7,7 @@ export const AG_GRID_LOCALE_HE = {
   noMatches: 'אין התאמה',
 
   // Number Filter & Text Filter
-  filterOoo: 'מסנן...',
+  filterOoo: 'הזן ערך...',
   equals: 'שווה',
   notEqual: 'לא שווה',
   blank: 'ריק',
@@ -15,10 +15,10 @@ export const AG_GRID_LOCALE_HE = {
   empty: 'בחר אחד',
 
   // Number Filter
-  lessThan: 'קטן מ',
-  greaterThan: 'גדול מ',
-  lessThanOrEqual: 'קטן מהערך או שווה לו',
-  greaterThanOrEqual: 'גדול מהערך או שווה לו',
+  lessThan: 'קטן מ-',
+  greaterThan: 'גדול מ-',
+  lessThanOrEqual: 'קטן או שווה ל-',
+  greaterThanOrEqual: 'גדול או שווה ל-',
   inRange: 'בטווח',
   inRangeStart: 'מ-',
   inRangeEnd: 'עד-',

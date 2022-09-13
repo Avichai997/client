@@ -6,23 +6,37 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import RtlProvider from 'components/RtlProvider';
 
-const SelectBox = ({ options = [], label, gridRef }) => {
+const SelectBox = ({
+  autoPagination,
+  setAutoPagination,
+  label,
+  options = [],
+  gridRef,
+}) => {
   const [selected, setSelected] = useState(options[0]);
-  
+
   useEffect(() => {
+
+    if (selected === 'התאם למסך') {
+      if (autoPagination) return;
+
+      setAutoPagination(true);
+      return;
+    }
+
+    setAutoPagination(false);
     gridRef.current.api?.paginationSetPageSize(+selected);
-  }, [selected, gridRef])
-  
+  }, [autoPagination, setAutoPagination, selected, gridRef]);
 
   return (
     <RtlProvider>
       <Box sx={{ minWidth: 130 }}>
         <FormControl sx={{ minWidth: 'inherit' }}>
-          <InputLabel >{label}</InputLabel>
+          <InputLabel>{label}</InputLabel>
           <Select
             value={selected}
             label={label}
-            onChange={event => setSelected(event.target.value)}
+            onChange={(event) => setSelected(event.target.value)}
           >
             {options.map((option, i) => (
               <MenuItem key={i} value={option}>
@@ -34,7 +48,6 @@ const SelectBox = ({ options = [], label, gridRef }) => {
       </Box>
     </RtlProvider>
   );
-}
+};
 
-
-export default  SelectBox
+export default SelectBox;

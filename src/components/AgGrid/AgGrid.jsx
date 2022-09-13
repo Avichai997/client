@@ -7,23 +7,27 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridReact } from 'ag-grid-react';
 import { AG_GRID_LOCALE_HE } from './local.he';
 
-import TextCellEditor from './TextCellEditor';
-import ActionCellRenderer from './ActionCellRenderer';
 import useWindowSize from 'hooks/useWindowsSize';
 import MultipleSelect from 'components/MultipleSelect';
-import { useDashboards } from 'hooks/useDashboards';
-import { useCustomersTypes } from 'hooks/useCustomersTypes';
 import { ToastConfirmDialog, ToastError } from 'components/Toasts';
 import { Box, Tooltip, IconButton } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import SelectBox from './SelectBox';
+import { useDashboards } from 'hooks/useDashboards';
+import { useCustomersTypes } from 'hooks/useCustomersTypes';
 import { useCustomers } from 'hooks/useCustomers';
-import CustomersSelectCellEditor from './CustomersSelectCellEditor';
+import { useLocation } from 'react-router-dom';
+import {getColumnsDefs, defaultColDef} from './columnsDefs';
 
 let sortActive = false;
 let filterActive = false;
 
 const AgGrid = () => {
+  let location = useLocation();
+  const page = location.pathname.slice(
+    location.pathname.lastIndexOf('/') + 1
+  );
+
   const gridRef = useRef(null);
   // default debounce is 150ms
   // const [windowWidth] = useWindowSize(150);
@@ -32,7 +36,8 @@ const AgGrid = () => {
   const [showPinnedRow, setShowPinnedRow] = useState(false);
   const [inputRow, setInputRow] = useState({});
   const [columnDefs, setColumnDefs] = useState([]);
-
+  const [autoPagination, setAutoPagination] = useState(true);
+  
   const toggleShowPinnedRow = () => {
     setShowPinnedRow((prevState) => !prevState);
   };
@@ -63,119 +68,7 @@ const AgGrid = () => {
     });
   }, [customers]);
 
-  const dateValueGetter = (params) => {
-    // return date in format '21.8.2022, 10:08:01'
-    const colName = params.colDef.field;
-    return new Date(`${params.data?.[colName]}`).toLocaleString();
-  };
-
-  const customerTypeValueGetter = (params) => {
-    const colName = params.colDef.field;
-    const colCustomerTypeId = params.data?.[colName];
-    return customersTypes?.find((type) => type.id === colCustomerTypeId)?.name;
-  };
-
-  const customersRenderer = (params) => {
-    if (!customers) return;
-    const colName = params.colDef.field; // excludeShualCityId || includeShualCityId
-    const colData = params.data?.[colName];
-
-    let results = [];
-    for (let index in colData) {
-      const customerName = customers.find(
-        (customer) => customer.shualCityId === colData[index]
-      )?.name;
-      customerName && results.push(customerName);
-    }
-    return <span>{results.join(', ')}</span>;
-  };
-
-  const columns = [
-    {
-      rowDrag: true,
-      enablePivot: true,
-      headerCheckboxSelection: true, // show select All checkbox
-      checkboxSelection: true, // allow checkbox
-      field: 'order',
-      headerName: 'סדר',
-      editable: false,
-      cellEditorParams: {
-        inputType: 'number',
-      },
-    },
-    {
-      field: 'name',
-      headerName: 'שם',
-      cellEditor: TextCellEditor,
-      cellEditorParams: {
-        inputType: 'text',
-        minLength: 3,
-        maxLength: 40,
-      },
-    },
-    {
-      field: 'url',
-      headerName: 'כתובת URL',
-      cellEditor: TextCellEditor,
-      cellEditorParams: {
-        inputType: 'url',
-      },
-    },
-    {
-      field: 'includeShualCityId',
-      headerName: 'אפשר צפייה ללקוחות',
-      cellRenderer: customersRenderer,
-      cellEditor: CustomersSelectCellEditor,
-      cellEditorPopup: true,
-      // cellEditorPopupPosition: 'under',
-      cellEditorParams: {
-        options: filteredCustomers,
-        limitTags: 2,
-      },
-    },
-    {
-      field: 'excludeShualCityId',
-      headerName: 'מנע צפייה מלקוחות',
-      cellRenderer: customersRenderer,
-      cellEditor: CustomersSelectCellEditor,
-      cellEditorPopup: true,
-      cellEditorParams: {
-        options: filteredCustomers,
-        limitTags: 2,
-      },
-    },
-    {
-      field: 'customerTypeId',
-      headerName: 'סוג לקוח',
-      valueGetter: customerTypeValueGetter,
-      width: 110,
-      maxWidth: 120,
-    },
-    {
-      field: 'updatedAt',
-      headerName: 'עדכון אחרון',
-      valueGetter: dateValueGetter,
-      editable: false,
-    },
-    {
-      headerName: 'פעולות',
-      width: 110,
-      minWidth: 110,
-      maxWidth: 110,
-      cellRendererSelector: (params) => {
-        return isPinnedRow(params)
-          ? undefined
-          : {
-              component: ActionCellRenderer,
-            };
-      },
-      editable: false,
-      colId: 'action',
-      cellStyle: {
-        justifyContent: 'center',
-      },
-    },
-  ];
+  const columns = [];
 
   // const autoSizeAll = useCallback((skipHeader) => {
   //   const allColumnIds = [];
@@ -197,56 +90,47 @@ const AgGrid = () => {
   //   adjustGridSize();
   // }, [windowWidth, adjustGridSize]);
 
-  useEffect(() => {
-    if (dashboards) {
-      setRowData(dashboards);
-    }
-  }, [dashboards]);
+  // useEffect(() => {
+  //   if (dashboards) {
+  //     setRowData(dashboards);
+  //   }
+  // }, [dashboards]);
 
   useEffect(() => {
-    if (customersTypes && filteredCustomers) {
-      setColumnDefs(columns);
+    let columns;
+    let rowsData;
+
+    switch (page) {
+      case 'dashboards':
+        if (!customersTypes || !filteredCustomers || !dashboards) return;
+        rowsData = dashboards;
+        columns = getColumnsDefs({
+          page,
+          customers,
+          filteredCustomers,
+          customersTypes,
+        });
+        break;
+
+      default:
+        break;
     }
-  }, [customersTypes, filteredCustomers, setColumnDefs]);
+    setColumnDefs(columns);
+    setRowData(rowsData);
+
+    if (customersTypes && filteredCustomers) {
+      // setColumnDefs(columns);
+    }
+  }, [page, dashboards, customers, customersTypes, filteredCustomers, setColumnDefs]);
 
   const localeText = useMemo(() => {
     return AG_GRID_LOCALE_HE;
   }, []);
 
-  const isPinnedRow = (params) => {
-    return params.node.rowPinned === 'top' ? true : false;
-  };
+  const isPinnedRow = (params) =>
+    params.node.rowPinned === 'top' ? true : false;
 
-  const pinnedRowHeaderFormatter = (params) => {
-    const { editable } = params.colDef;
-    if (isPinnedRow(params)) {
-      if (!editable) return '';
 
-      return `${params.colDef.headerName}...`;
-    }
-    return undefined;
-  };
-
-  const defaultColDef = useMemo(() => {
-    return {
-      editable: true,
-      sortable: true,
-      resizable: true,
-      flex: 1,
-      minWidth: 80,
-      filter: true,
-      enableRowGroup: true,
-      enablePivot: true,
-      enableValue: true,
-      cellStyle: {
-        height: '100%',
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-      },
-      valueFormatter: pinnedRowHeaderFormatter,
-    };
-  }, []);
 
   const onGridReady = useCallback((params) => {}, []);
 
@@ -320,6 +204,7 @@ const AgGrid = () => {
         break;
       case 'cancel':
         params.api.stopEditing(true);
+        isPinnedRow(params) && setInputRow({});
         break;
       default:
         break;
@@ -347,9 +232,9 @@ const AgGrid = () => {
   // suppress row drag if either sort or filter is active
   const handleSuppressRowDrag = useCallback(() => {
     const suppressRowDrag = sortActive || filterActive;
-    console.log(
-      `sortActive = ${sortActive}, filterActive = ${filterActive}, allowRowDrag = ${suppressRowDrag}`
-    );
+    // console.log(
+    //   `sortActive = ${sortActive}, filterActive = ${filterActive}, allowRowDrag = ${suppressRowDrag}`
+    // );
     gridRef.current.api.setSuppressRowDrag(suppressRowDrag);
   }, []);
 
@@ -371,7 +256,7 @@ const AgGrid = () => {
       const movingNode = event.node;
       const overNode = event.overNode;
       if (!overNode) {
-        console.log(overNode)
+        console.log(overNode);
         return;
       }
       const rowNeedsToMove = movingNode !== overNode;
@@ -420,8 +305,10 @@ const AgGrid = () => {
 
         <Box sx={{ display: 'flex' }}>
           <SelectBox
+            autoPagination={autoPagination}
+            setAutoPagination={setAutoPagination}
             label='מספר רשומות להצגה'
-            options={[10, 20, 30, 50, 100]}
+            options={['התאם למסך' ,5 ,10, 20, 30, 50, 100]}
             gridRef={gridRef}
           />
 
@@ -443,8 +330,6 @@ const AgGrid = () => {
           // sideBar={true}
           rowGroupPanelShow={'always'}
           enableRangeSelection={true}
-          rowSelection={'multiple'}
-          suppressRowClickSelection={true}
           enableCharts={true}
           // Style
           localeText={localeText}
@@ -459,8 +344,7 @@ const AgGrid = () => {
           onRowEditingStarted={onRowEditingStarted}
           onCellClicked={onCellClicked}
           onCellEditingStopped={onCellEditingStopped}
-          // suppressClickEdit={true} // disable double/single click to edit a row
-
+          suppressClickEdit={false} // disable double/single click to edit a row
           // Dragging
           rowDragManaged={false} // row drag managed by ag-grid. dragging won't work with pagination' filtering' sorting etc...
           rowDragMultiRow={true} // enable row dragging and multi-row dragging
@@ -470,19 +354,20 @@ const AgGrid = () => {
           onFilterChanged={onFilterChanged}
           onRowDragMove={onRowDragMove}
           getRowId={getRowId}
+          // Selection
+          rowSelection={'multiple'}
+          suppressRowClickSelection={true}
+          onRowSelected={onRowSelected}
           // pagination
           pagination={true}
-          paginationPageSize={10}
-          // paginationAutoPageSize={true} // display number of viewed rows auto
+          // paginationPageSize={10}
+          paginationAutoPageSize={autoPagination} // display number of viewed rows auto
 
           statusBar={statusBar}
           // onRowValueChanged={onRowValueChanged}
           // suppressCellFocus={true} // supress keyboard navigation
           // onCellFocused={onCellFocused}
           // onCellFocused={onCellFocused}
-
-          // Selection
-          // onRowSelected={onRowSelected}
 
           onGridReady={onGridReady}
         ></AgGridReact>
