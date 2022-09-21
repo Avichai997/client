@@ -3,7 +3,7 @@ import { memo, useState, forwardRef, useImperativeHandle } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import { TextField, Checkbox, Chip } from '@mui/material';
 import { CheckBoxOutlineBlank, CheckBox } from '@mui/icons-material';
-import RtlProvider from 'components/RtlProvider';
+import RtlProvider from 'utils/RtlProvider';
 
 const CustomersSelectCellEditor = memo(
   forwardRef((props, ref) => {
@@ -111,16 +111,6 @@ const CustomersSelectCellEditor = memo(
             sx={{ width: props.column.actualWidth, paddingTop: '10px' }}
           />
         </RtlProvider>
-
-        {/* <MultipleSelect
-          ref={selectRef}
-          label={headerName}
-          options={props.options}
-          limitTags={props.limitTags || 5}
-          sortBy={'shualCityId'}
-          img={'logo'}
-          style={}
-        /> */}
       </>
     );
   })

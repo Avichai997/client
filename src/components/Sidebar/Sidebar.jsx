@@ -31,12 +31,12 @@ const routes = [
         icon: <Dashboard />,
       },
       {
-        path: 'update/types',
+        path: 'update/customers',
         name: 'לקוחות',
         icon: <SupportAgent />,
       },
       {
-        path: 'update/customers',
+        path: 'update/types',
         name: 'סוגי לקוחות',
         icon: <People />,
       },

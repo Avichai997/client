@@ -1,9 +1,5 @@
-import React, { useState } from 'react';
-import {
-  LockOutlined,
-  Visibility,
-  VisibilityOff,
-} from '@mui/icons-material';
+import { useState } from 'react';
+import { LockOutlined, Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -19,27 +15,40 @@ import {
 } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import RtlProvider from 'components/RtlProvider';
+import RtlProvider from 'utils/RtlProvider';
 import Copyright from 'components/Copyright';
+import { useAuth } from 'hooks/useAuth';
+import { useUser } from 'hooks/useUser';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-
+  const { login } = useAuth();
+  
   const initialValues = {
     email: '',
     password: '',
   };
 
+  const passwordRegExp =
+    /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('האימייל שהוזן אינו תקין')
       .required('חובה להזין כתובת אימייל'),
-    password: Yup.string().required('חובה להזין סיסמה'),
+    password: Yup.string()
+      .min(10, 'אורך הסיסמה חייב להיות 10 תווים לפחות')
+      .matches(
+        passwordRegExp,
+        'הסיסמה חייבת לכלול אות אחת גדולה, קטנה, מספר, ותו מיוחד'
+      )
+      .required('חובה להזין סיסמה'),
   });
 
   const onSubmit = (values, props) => {
-    alert(JSON.stringify(values), null, 2);
-    props.resetForm();
+    login(values, props.resetForm);
+
+    // props.resetForm();
   };
 
   return (
@@ -64,7 +73,7 @@ const Login = () => {
           validationSchema={validationSchema}
           onSubmit={onSubmit}
         >
-          {(props) => (
+          {(formik) => (
             <Form noValidate>
               <RtlProvider>
                 <Field
@@ -72,40 +81,52 @@ const Login = () => {
                   name='email'
                   label='כתובת אימייל'
                   fullWidth
-                  error={props.errors.email && props.touched.email}
+                  error={formik.errors.email && formik.touched.email}
                   helperText={<ErrorMessage name='email' />}
                   required
                   margin='normal'
                   type='email'
                   variant='outlined'
                   autoComplete='email'
+                  autoFocus={true}
                   style={{ direction: 'ltr' }}
-                />
+                  />
 
                 <Field
                   as={TextField}
                   name='password'
                   label='סיסמא'
                   fullWidth
-                  error={props.errors.password && props.touched.password}
+                  error={formik.errors.password && formik.touched.password}
                   helperText={<ErrorMessage name='password' />}
                   required
                   id='password'
-                  className={'formInput'}
+                  // className={'formInput'}
                   type={showPassword ? 'text' : 'password'}
                   variant='outlined'
                   autoComplete='current-password'
                   margin='normal'
                   style={{ direction: 'ltr' }}
                   InputProps={{
+                    componentsProps: {
+                      input: {
+                        style: { paddingLeft: '14px' },
+                      },
+                      root: {
+                        style: { padding: 0 },
+                      },
+                    },
                     endAdornment: (
-                      <InputAdornment position='end'>
+                      <InputAdornment
+                        position='end'
+                        style={{ position: 'absolute', right: 0 }}
+                      >
                         <IconButton
                           aria-label='toggle password visibility'
                           onClick={() => setShowPassword(!showPassword)}
                           edge='end'
                         >
-                          {props.values.password ? (
+                          {formik.values.password ? (
                             showPassword ? (
                               <VisibilityOff />
                             ) : (
@@ -118,6 +139,9 @@ const Login = () => {
                       </InputAdornment>
                     ),
                   }}
+                  inputProps={{
+                    style: { paddingLeft: '14px' },
+                  }}
                 />
 
                 <FormControlLabel
@@ -129,6 +153,7 @@ const Login = () => {
                   fullWidth
                   variant='contained'
                   sx={{ mt: 3, mb: 2 }}
+                  disabled={!formik.isValid}
                 >
                   התחבר
                 </Button>

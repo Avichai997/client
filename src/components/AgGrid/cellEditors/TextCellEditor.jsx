@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import RtlProvider from 'components/RtlProvider';
+import RtlProvider from 'utils/RtlProvider';
 import { memo, forwardRef, useRef, useImperativeHandle } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -24,6 +24,7 @@ const TextEditor = memo(
           `שדה זה צריך להכיל ${props.maxLength} תווים לכל היותר`
         )
         .required(requiredMessage),
+      url: Yup.string().url('כתובת URL לא תקינה').required(requiredMessage),
       url: Yup.string().url('כתובת URL לא תקינה').required(requiredMessage),
     };
 
@@ -74,7 +75,7 @@ const TextEditor = memo(
           // onSubmit={onSubmit}
         >
           {(formikProps) => (
-            <Form noValidate>
+            <Form style={{width: '100%'}} noValidate>
               <RtlProvider>
                 <Field
                   as={TextField}
@@ -92,7 +93,9 @@ const TextEditor = memo(
                   type={inputType}
                   autoComplete={inputType}
                   variant='outlined'
-                  style={{ margin: '10px 0px 0px 0px' }}
+                  style={{ margin: '10px 0px 0px 0px',
+                  direction: inputType === 'url' ? 'ltr' : ''
+                 }}
                   size='small'
                 />
               </RtlProvider>

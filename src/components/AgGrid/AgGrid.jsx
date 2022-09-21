@@ -7,7 +7,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { AgGridReact } from 'ag-grid-react';
 import { AG_GRID_LOCALE_HE } from './local.he';
 
-import useWindowSize from 'hooks/useWindowsSize';
+// import useWindowSize from 'hooks/useWindowsSize';
 import MultipleSelect from 'components/MultipleSelect';
 import { ToastConfirmDialog, ToastError } from 'components/Toasts';
 import { Box, Tooltip, IconButton } from '@mui/material';
@@ -17,27 +17,24 @@ import { useDashboards } from 'hooks/useDashboards';
 import { useCustomersTypes } from 'hooks/useCustomersTypes';
 import { useCustomers } from 'hooks/useCustomers';
 import { useLocation } from 'react-router-dom';
-import {getColumnsDefs, defaultColDef} from './columnsDefs';
+import { getColumnsDefs, defaultColDef } from './columnsDefs';
+import { useUsers } from 'hooks/useUsers';
 
 let sortActive = false;
 let filterActive = false;
 
 const AgGrid = () => {
-  let location = useLocation();
-  const page = location.pathname.slice(
-    location.pathname.lastIndexOf('/') + 1
-  );
-
+  const location = useLocation();
+  const page = location.pathname.slice(location.pathname.lastIndexOf('/') + 1);
   const gridRef = useRef(null);
   // default debounce is 150ms
   // const [windowWidth] = useWindowSize(150);
-  const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
-  const [rowData, setRowData] = useState();
+  const [rowsData, setRowsData] = useState([]);
+  const [columnsDefs, setColumnsDefs] = useState([]);
   const [showPinnedRow, setShowPinnedRow] = useState(false);
   const [inputRow, setInputRow] = useState({});
-  const [columnDefs, setColumnDefs] = useState([]);
   const [autoPagination, setAutoPagination] = useState(true);
-  
+
   const toggleShowPinnedRow = () => {
     setShowPinnedRow((prevState) => !prevState);
   };
@@ -45,30 +42,14 @@ const AgGrid = () => {
   const { customersTypes } = useCustomersTypes({
     params: '?sort=-name',
   });
-
-  const { customers } = useCustomers({
-    params: '?sort=shualCityId',
-  });
-
   const { dashboards } = useDashboards({
     params: '?sort=order&customerTypeId=62ea79dbd152c7c170473ae0',
     options: { enabled: !!customersTypes },
   });
-
-  const filteredCustomers = useMemo(() => {
-    if (!customers) return;
-
-    return customers.map((customer) => {
-      const { name, shualCityId, logo } = customer;
-      return {
-        name,
-        shualCityId,
-        logo,
-      };
-    });
-  }, [customers]);
-
-  const columns = [];
+  const { customers } = useCustomers({
+    params: '?sort=shualCityId',
+  });
+  const { users } = useUsers();
 
   // const autoSizeAll = useCallback((skipHeader) => {
   //   const allColumnIds = [];
@@ -92,36 +73,67 @@ const AgGrid = () => {
 
   // useEffect(() => {
   //   if (dashboards) {
-  //     setRowData(dashboards);
+  //     setRowsData(dashboards);
   //   }
   // }, [dashboards]);
 
-  useEffect(() => {
-    let columns;
-    let rowsData;
+  const changePageData = useCallback(({ rowsData, columnsDefs }) => {
+    columnsDefs = getColumnsDefs(columnsDefs);
+    setColumnsDefs(columnsDefs);
+    setRowsData(rowsData);
+  }, []);
 
+  useEffect(() => {
     switch (page) {
       case 'dashboards':
-        if (!customersTypes || !filteredCustomers || !dashboards) return;
-        rowsData = dashboards;
-        columns = getColumnsDefs({
-          page,
-          customers,
-          filteredCustomers,
-          customersTypes,
+        if (!customersTypes || !dashboards) return;
+        changePageData({
+          rowsData: dashboards,
+          columnsDefs: {
+            page,
+            customers,
+            customersTypes,
+          },
+        });
+        break;
+
+      case 'customers':
+        if (!customersTypes) return;
+        changePageData({
+          rowsData: customers,
+          columnsDefs: {
+            page,
+            customersTypes,
+          },
+        });
+        break;
+
+      case 'types':
+        if (!customersTypes) return;
+        changePageData({
+          rowsData: customers,
+          columnsDefs: {
+            page,
+            customersTypes,
+          },
+        });
+        break;
+
+      case 'users':
+        if (!users) return;
+        changePageData({
+          rowsData: users,
+          columnsDefs: {
+            page,
+            users,
+          },
         });
         break;
 
       default:
         break;
     }
-    setColumnDefs(columns);
-    setRowData(rowsData);
-
-    if (customersTypes && filteredCustomers) {
-      // setColumnDefs(columns);
-    }
-  }, [page, dashboards, customers, customersTypes, filteredCustomers, setColumnDefs]);
+  }, [page, dashboards, customers, customersTypes, changePageData]);
 
   const localeText = useMemo(() => {
     return AG_GRID_LOCALE_HE;
@@ -129,8 +141,6 @@ const AgGrid = () => {
 
   const isPinnedRow = (params) =>
     params.node.rowPinned === 'top' ? true : false;
-
-
 
   const onGridReady = useCallback((params) => {}, []);
 
@@ -140,33 +150,34 @@ const AgGrid = () => {
     (params) => {
       if (!isPinnedRow(params)) return;
 
-      const allDataFilled = columnDefs.every((def) =>
+      const allDataFilled = columnsDefs.every((def) =>
         def.editable === false ? true : inputRow[def.field]
       );
       if (allDataFilled) {
-        setRowData([...rowData, inputRow]);
+        setRowsData([...rowsData, inputRow]);
         setInputRow({});
         toggleShowPinnedRow();
       } else {
         ToastError('לא כל השדות מולאו, הרשומה לא נשמרה.');
       }
     },
-    [rowData, inputRow, columnDefs]
+    [rowsData, inputRow, columnsDefs]
   );
 
   const onRowEditingStarted = useCallback((params) => {
     params.api.refreshCells({
       columns: ['action'],
       rowNodes: [params.node],
-      force: true,
+      // force: true,
     });
   }, []);
 
   const onRowEditingStopped = useCallback((params) => {
+    console.log(params);
     params.api.refreshCells({
       columns: ['action'],
       rowNodes: [params.node],
-      force: true,
+      // force: true,
     });
   }, []);
 
@@ -243,43 +254,62 @@ const AgGrid = () => {
     const colState = gridRef.current.columnApi.getColumnState() || [];
     sortActive = colState.some((c) => c.sort);
     handleSuppressRowDrag();
-  }, []);
+  }, [handleSuppressRowDrag]);
 
   // listen for changes on filter changed
   const onFilterChanged = useCallback(() => {
     filterActive = gridRef.current.api.isAnyFilterPresent();
     handleSuppressRowDrag();
-  }, []);
+  }, [handleSuppressRowDrag]);
 
   const onRowDragMove = useCallback(
     (event) => {
       const movingNode = event.node;
       const overNode = event.overNode;
-      if (!overNode) {
-        console.log(overNode);
-        return;
-      }
       const rowNeedsToMove = movingNode !== overNode;
-      if (rowNeedsToMove) {
-        // the list of rows we have is data, not row nodes, so extract the data
-        const movingData = movingNode.data;
-        const overData = overNode.data;
-        const fromIndex = rowData.indexOf(movingData);
-        const toIndex = rowData.indexOf(overData);
-        const newStore = rowData.slice();
-        moveInArray(newStore, fromIndex, toIndex);
-        // rowData = newStore;
-        setRowData(newStore);
-        gridRef.current.api.clearFocusedCell();
-      }
+      if (!overNode || !rowNeedsToMove) return;
+
+      // the list of rows we have is data, not row nodes, so extract the data
+      const movingData = movingNode.data;
+      const overData = overNode.data;
+      const fromIndex = rowsData.indexOf(movingData);
+      const toIndex = rowsData.indexOf(overData);
+      const newStore = rowsData.slice();
+      moveInArray(newStore, fromIndex, toIndex);
+      setRowsData(newStore);
+      gridRef.current.api.clearFocusedCell();
+
       function moveInArray(arr, fromIndex, toIndex) {
         const element = arr[fromIndex];
         arr.splice(fromIndex, 1);
         arr.splice(toIndex, 0, element);
       }
     },
-    [rowData]
+    [rowsData]
   );
+  const onRowDragEnd = useCallback((event) => {
+    let fromIndex = event.node.data.order - 1;
+    let toIndex = event.overIndex;
+    let updatedRows = [];
+    const newStore = gridRef.current.props.rowData.slice();
+    if (fromIndex > toIndex) {
+      [fromIndex, toIndex] = [toIndex, fromIndex];
+    }
+
+    for (let i = fromIndex; i <= toIndex; i++) {
+      newStore[i].order = i + 1;
+      updatedRows.push(newStore[i]);
+    }
+
+    setRowsData(newStore);
+    gridRef.current.api.refreshCells({
+      columns: ['order'],
+      rowNodes: updatedRows,
+      force: true,
+    });
+
+    console.log(updatedRows);
+  }, []);
 
   const getRowId = useCallback((params) => {
     return params.data.id;
@@ -295,20 +325,20 @@ const AgGrid = () => {
           m: 1,
         }}
       >
-        {customersTypes && (
+        {page === 'dashboards' && customersTypes ? (
           <MultipleSelect
             label='הצג דשבורדים של לקוחות:'
             options={customersTypes}
             limitTags={3}
           />
-        )}
+        ) : <div/>}
 
         <Box sx={{ display: 'flex' }}>
           <SelectBox
             autoPagination={autoPagination}
             setAutoPagination={setAutoPagination}
             label='מספר רשומות להצגה'
-            options={['התאם למסך' ,5 ,10, 20, 30, 50, 100]}
+            options={['התאם למסך', 5, 10, 20, 30, 50, 100]}
             gridRef={gridRef}
           />
 
@@ -320,12 +350,12 @@ const AgGrid = () => {
         </Box>
       </Box>
 
-      <div style={gridStyle} className='ag-theme-alpine'>
+      <div className='ag-theme-alpine agGrid'>
         <AgGridReact
           // grid properties
           ref={gridRef}
-          rowData={rowData}
-          columnDefs={columnDefs}
+          rowData={rowsData}
+          columnDefs={columnsDefs}
           defaultColDef={defaultColDef}
           // sideBar={true}
           rowGroupPanelShow={'always'}
@@ -346,29 +376,29 @@ const AgGrid = () => {
           onCellEditingStopped={onCellEditingStopped}
           suppressClickEdit={false} // disable double/single click to edit a row
           // Dragging
-          rowDragManaged={false} // row drag managed by ag-grid. dragging won't work with pagination' filtering' sorting etc...
           rowDragMultiRow={true} // enable row dragging and multi-row dragging
+          rowDragManaged={false} // row drag managed by ag-grid. dragging won't work with pagination' filtering' sorting etc...
           // suppressRowDrag={true} // prevent row dragging when sorting or filtering is active
           // suppressMoveWhenRowDragging={false} // false = play animation on drag rows
           onSortChanged={onSortChanged}
           onFilterChanged={onFilterChanged}
           onRowDragMove={onRowDragMove}
+          onRowDragEnd={onRowDragEnd}
           getRowId={getRowId}
           // Selection
           rowSelection={'multiple'}
-          suppressRowClickSelection={true}
-          onRowSelected={onRowSelected}
+          // suppressRowClickSelection={true}
+          // onRowSelected={onRowSelected}
           // pagination
           pagination={true}
           // paginationPageSize={10}
           paginationAutoPageSize={autoPagination} // display number of viewed rows auto
-
           statusBar={statusBar}
           // onRowValueChanged={onRowValueChanged}
           // suppressCellFocus={true} // supress keyboard navigation
           // onCellFocused={onCellFocused}
           // onCellFocused={onCellFocused}
-
+          // enableCellChangeFlash={true}
           onGridReady={onGridReady}
         ></AgGridReact>
       </div>

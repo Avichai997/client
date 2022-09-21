@@ -1,30 +1,38 @@
-import { useState, useEffect } from 'react';
-import { useSwiperSlide, useSwiper } from 'swiper/react';
+import { useEffect } from 'react';
+import { useSwiperSlide } from 'swiper/react';
 
-const Slide = ({ url, reset, autoLoad, slideIndex, onReset }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+const Slide = ({
+  id,
+  url,
+  activeSlides,
+  setActiveSlides,
+}) => {
   const swiperSlide = useSwiperSlide();
   const isActive = swiperSlide.isActive;
-  const swiper = useSwiper();
+  const slideIsLoaded = activeSlides[id]; // the current loading status of the slide. true || false
+
 
   useEffect(() => {
-    if (isActive) {
-      setIsLoaded(true);
-    } else if (reset) {
-      setIsLoaded(false);
-      onReset();
+    // save slide as active only if the slide is currently visited and not active
+    if (isActive && slideIsLoaded === false) {
+      setActiveSlides((state) => ((state[id] = true), {...state}));
+    } else if (isActive && slideIsLoaded) {
+      console.log('slide Loaded');
     }
-  }, [swiper.activeIndex, isActive, reset, onReset]);
+  }, [isActive, slideIsLoaded, setActiveSlides, id]);
 
-  useEffect(() => {
-    if (autoLoad) {
-      setIsLoaded(true);
-    }
-  }, [autoLoad]);
+  // useEffect(() => {
+    // const iframe = document.getElementById('test');
+    // const url = iframe.src;
+    // iframe.src = 'about:blank';
+    // setTimeout((iframe, url) => {
+    //     iframe.src = url;
+    // }, 10);
+  // }, []);
 
   return (
     <>
-      <iframe src={isLoaded ? url : ''} title={url}></iframe>;
+      <iframe src={activeSlides[id] ? url : ''} title={id}></iframe>
     </>
   );
 };

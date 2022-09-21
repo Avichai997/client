@@ -95,9 +95,9 @@ export const AG_GRID_LOCALE_HE = {
   copyWithGroupHeaders: 'העתק עם כותרות קבוצה',
   paste: 'הדבק',
   ctrlV: 'Ctrl+V',
-  export: 'יְצוּא',
-  csvExport: 'CSV יְצוּא',
-  excelExport: 'Excel יְצוּא',
+  export: 'יצוא',
+  csvExport: 'CSV יצוא',
+  excelExport: 'Excel יצוא',
 
   // Enterprise Menu Aggregation and Status Bar
   sum: 'סכום',

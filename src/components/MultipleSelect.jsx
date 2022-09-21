@@ -2,7 +2,7 @@ import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import { TextField, Checkbox, Chip } from '@mui/material';
 import { CheckBoxOutlineBlank, CheckBox } from '@mui/icons-material';
-import RtlProvider from 'components/RtlProvider';
+import RtlProvider from 'utils/RtlProvider';
 
 const MultipleSelect = forwardRef(
   ({ options, label, limitTags = 2, style }, ref) => {

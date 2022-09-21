@@ -1,8 +1,15 @@
-.agContainer {
+.agGrid {
   width: 100%;
   height: 100%;
+  .ag-row-selected {
+    background-color: rgba(33,150,243, 0);
+  }
 }
 
 .ag-watermark {
   display: none !important;
+}
+
+.ag-menu-option-text, .ag-compact-menu-option-text{
+  direction: ltr;
 }

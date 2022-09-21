@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+import { useState } from 'react';
 import { styled, FormControlLabel } from '@mui/material';
 import { default as muiSwitch } from '@mui/material/Switch';
 
@@ -36,13 +36,13 @@ const Android12Switch = styled(muiSwitch)(({ theme }) => ({
 }));
 
 const Switch = ({toggleFn}) => {
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isOn, setIsOn] = useState(false);
 
   return (
     <FormControlLabel
     onChange={() => {
-        // setIsLoading(!isLoading);
-        toggleFn()
+        setIsOn(!isOn);
+        toggleFn(!isOn)
       }}
       sx={{
         position: 'absolute',

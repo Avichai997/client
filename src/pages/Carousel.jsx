@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDashboards } from 'hooks/useDashboards';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Slide from 'components/Slide';
@@ -15,37 +15,49 @@ import {
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import './Carousel.css';
+import './Carousel.scss';
+import { TaskAlt } from '@mui/icons-material';
 
-function Carousel() {
-  const { dashboards } = useDashboards();
+const Carousel = () => {
+  const swiperRef = useRef();
+
+  const { dashboards } = useDashboards({
+    params: '?sort=order',
+  });
 
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
-  const [autoLoad, setAutoLoad] = useState(false);
-  const [reset, setReset] = useState(false);
-  const [resetCount, setResetCount] = useState(0);
+  const [activeSlides, setActiveSlides] = useState({});
 
-  const changeLoadingStatus = (status) => {
-    // on ==> off
-    if (autoLoad) {
-      setReset(true);
-      setAutoLoad(false);
-    } else {
-      // off ==> on
-      setAutoLoad(true);
-    }
+  const isEmptyObject = (obj) => {
+    return (
+      obj &&
+      Object.keys(obj).length === 0 &&
+      Object.getPrototypeOf(obj) === Object.prototype
+    );
   };
 
-  const checkReset = () => {
-    setResetCount((prev) => prev + 1);
+  const changeLoadingStatus = (isOn) => {
+    console.log(swiperRef);
+    setActiveSlides((state) => {
+      for (let slideId in state) {
+        state[slideId] = isOn;
+      }
+      if (!isOn) {
+        const activeSlideIndex = swiperRef.current.swiper.realIndex;
+        const activeSlideId = dashboards[activeSlideIndex].id;
+        state[activeSlideId] = true;
+      }
+      return { ...state };
+    });
   };
 
   useEffect(() => {
-    if (resetCount === dashboards?.length) {
-      setResetCount(0);
-      setReset(false);
+    if (dashboards && isEmptyObject(activeSlides)) {
+      const res = {};
+      dashboards.forEach((dashboard) => (res[dashboard.id] = false));
+      setActiveSlides(res);
     }
-  }, [resetCount]);
+  }, [dashboards, activeSlides]);
 
   return (
     <>
@@ -53,15 +65,16 @@ function Carousel() {
         <>
           <Swiper
             dir='rtl'
+            ref={swiperRef}
             grabCursor
-            // onSwiper={(swiper) => setSwiper(swiper)}
-            // onSlideChange={() => setActiveIndex(swiper?.activeIndex)}
-            // watchSlidesProgress={true} // enable 'isVisible' <SwiperSlide> prop
             navigation
             loop
             mousewheel
             keyboard
             thumbs={{ swiper: thumbsSwiper }}
+            // onSwiper={(swiper) => setSwiper(swiper)}
+            // onSlideChange={() => setActiveIndex(swiper?.activeIndex)}
+            // watchSlidesProgress={true} // enable 'isVisible' <SwiperSlide> prop
             // pagination={{
             //   dynamicBullets: true,
             //   clickable: true,
@@ -82,11 +95,10 @@ function Carousel() {
             {dashboards.map((dashboard, index) => (
               <SwiperSlide key={index}>
                 <Slide
-                  reset={reset}
-                  autoLoad={autoLoad}
+                  id={dashboard.id}
                   url={dashboard.url}
-                  slideIndex={index + 1}
-                  onReset={checkReset}
+                  activeSlides={activeSlides}
+                  setActiveSlides={setActiveSlides}
                 />
               </SwiperSlide>
             ))}
@@ -99,7 +111,7 @@ function Carousel() {
             loop
             dir='rtl'
             spaceBetween={20}
-            slidesPerView={dashboards.length}
+            slidesPerView={dashboards.length > 10 ? 10 : dashboards.length}
             freeMode
             mousewheel
             watchSlidesProgress
@@ -108,6 +120,7 @@ function Carousel() {
           >
             {dashboards.map((dashboard, index) => (
               <SwiperSlide key={index}>
+                {activeSlides[dashboard.id] && <TaskAlt />}
                 <div>{dashboard.name}</div>
               </SwiperSlide>
             ))}
@@ -116,6 +129,6 @@ function Carousel() {
       )}
     </>
   );
-}
+};
 
 export default Carousel;
