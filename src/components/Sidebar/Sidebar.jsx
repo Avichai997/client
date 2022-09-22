@@ -18,83 +18,35 @@ const routes = [
   {
     path: '', // default path
     name: ' Dashboard',
-    icon: <House />,
+    icon: House,
   },
   {
     path: 'update',
     name: 'ערוך מידע',
-    icon: <AppRegistration />,
+    icon: AppRegistration,
     subRoutes: [
       {
         path: 'update/dashboards',
         name: 'דשבורדים',
-        icon: <Dashboard />,
+        icon: Dashboard,
       },
       {
         path: 'update/customers',
         name: 'לקוחות',
-        icon: <SupportAgent />,
+        icon: SupportAgent,
       },
       {
         path: 'update/types',
         name: 'סוגי לקוחות',
-        icon: <People />,
+        icon: People,
       },
       {
         path: 'update/users',
         name: 'משתמשים',
-        icon: <Person />,
+        icon: Person,
       },
     ],
   },
-  // {
-  //   path: 'users',
-  //   name: 'Users',
-  //   icon: <Person />,
-  // },
-  // {
-  //   path: 'messages',
-  //   name: 'Messages',
-  //   icon: <Message />,
-  // },
-  // {
-  //   path: 'analytics',
-  //   name: 'Analytics',
-  //   icon: <Analytics />,
-  // },
-  // {
-  //   path: 'order',
-  //   name: 'Order',
-  //   icon: <ShoppingCart />,
-  // },
-  // {
-  //   path: 'settings',
-  //   name: 'Settings',
-  //   icon: <SettingsOutlined />,
-  //   exact: true,
-  //   subRoutes: [
-  //     {
-  //       path: 'settings/profile',
-  //       name: 'Profile ',
-  //       icon: <Person />,
-  //     },
-  //     {
-  //       path: 'settings/2fa',
-  //       name: '2FA',
-  //       icon: <Lock />,
-  //     },
-  //     {
-  //       path: 'settings/billing',
-  //       name: 'Billing',
-  //       icon: <AttachMoney />,
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: 'saved',
-  //   name: 'Saved',
-  //   icon: <Favorite />,
-  // },
 ];
 
 const Sidebar = () => {
@@ -195,6 +147,8 @@ const Sidebar = () => {
               );
             }
 
+            const Icon = route.icon;
+
             return (
               <NavLink
                 end // = exact path
@@ -204,7 +158,7 @@ const Sidebar = () => {
                   'link' + (isActive ? ' active' : '')
                 }
               >
-                <div className='icon'>{route.icon}</div>
+                <Icon className='icon'/>
                 <AnimatePresence>
                   {isOpen && (
                     <motion.div

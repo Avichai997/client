@@ -5,6 +5,8 @@ import Carousel from 'pages/Carousel';
 import Login from 'pages/Login';
 import NoMatch from 'pages/NoMatch';
 import { useUser } from './hooks/useUser';
+import ProtectRoute from 'components/ProtectRoute';
+import ProtectedRoute from 'components/ProtectRoute';
 
 const Loadable = (Component) => (props) =>
   (
@@ -26,10 +28,18 @@ function App() {
       <Routes>
         <Route path='/' element={<Carousel />} />
         <Route path='/Login' element={<Login />} />
-        {<Route path='/Admin/' element={<Admin />}>
+
+        <Route
+          path='/Admin/'
+          element={
+            <ProtectRoute>
+              <Admin />
+            </ProtectRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path='update/:collection' element={<Update />} />
-        </Route>}
+        </Route>
 
         <Route path='*' element={<NoMatch />} />
       </Routes>

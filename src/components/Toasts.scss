@@ -3,19 +3,22 @@
   align-items: center;
 
   &.swal2-icon-error {
-    background-color: #f27474;
+    background-color: #f27474 !important;
+  }
+  &.swal2-error {
+    background-color: #f27474 !important;
   }
   &.swal2-icon-success {
-    background-color: #a5dc86;
+    background-color: #a5dc86 !important;
   }
   &.swal2-icon-warning {
-    background-color: #f8bb86;
+    background-color: #f8bb86 !important;
   }
   &.swal2-icon-info {
-    background-color: #3fc3ee;
+    background-color: #3fc3ee !important;
   }
   &.swal2-icon-question {
-    background-color: #87adbd;
+    background-color: #87adbd !important;
   }
 
   .swal2-container {
@@ -27,7 +30,7 @@
     margin: 0 !important;
   }
   .swal2-confirm {
-    background: inherit;
+    background: inherit !important;
     color: white;
     margin: 0 !important;
     position: absolute;

@@ -12,9 +12,6 @@ const Toast = Swal.mixin({
   timer: 2500,
   timerProgressBar: true,
   iconColor: 'white',
-  customClass: {
-    popup: 'colored-toast',
-  },
   didOpen: (toast) => {
     toast.addEventListener('mouseenter', Swal.stopTimer);
     toast.addEventListener('mouseleave', Swal.resumeTimer);

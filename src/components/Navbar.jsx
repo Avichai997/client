@@ -26,13 +26,15 @@ const Navbar = () => {
           <NotificationsNoneOutlined className='item' />
           <ChatBubbleOutlined className='item' />
           {/* <ListOutlined className='item' /> */}
-          <Dropdown />
           {user ? (
-            <Avatar
-              alt='Remy Sharp'
-              src={`${process.env.REACT_APP_API_URL}/img/users/${user.photo}`}
-              className='item avatar'
-            />
+            <>
+              <Dropdown />
+              <Avatar
+                alt='Remy Sharp'
+                src={`${process.env.REACT_APP_API_URL}/img/users/${user.photo}`}
+                className='item avatar'
+              />
+            </>
           ) : (
             <NavLink className='item' to='/login'>
               התחבר

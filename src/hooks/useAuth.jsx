@@ -1,23 +1,25 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToastSuccess } from 'components/Toasts';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useAuth = (props) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { mutate: authMutation } = useMutation();
 
   const getUserData = (userData) => ({
     token: userData.token,
     tokenExpiration: userData.tokenExpiration,
-    id: userData.data.user._id,
-    name: userData.data.user.name,
-    email: userData.data.user.email,
-    photo: userData.data.user.photo,
+    id: userData.data._id,
+    name: userData.data.name,
+    email: userData.data.email,
+    photo: userData.data.photo,
   });
 
   const updateLocaleStorage = (rawUserData) => {
-    const userData = getUserData(rawUserData);
+    // extract specific fields from raw user data and set it in memory and cache
+    const userData = rawUserData ? getUserData(rawUserData) : null;
     localStorage.setItem('user', JSON.stringify(userData));
     queryClient.setQueryData(['user'], userData);
   };
@@ -36,6 +38,7 @@ export const useAuth = (props) => {
         onSuccess: (data, variables, context) => {
           ToastSuccess('ההרשמה בוצעה בהצלחה!');
           updateLocaleStorage(data);
+          // navigate('/Login');
           // resetForm();
         },
       }
@@ -50,9 +53,10 @@ export const useAuth = (props) => {
       },
       {
         onSuccess: (data, variables, context) => {
-          ToastSuccess(`שלום ${data.data.user.name}`);
+          ToastSuccess(`שלום ${data.data.name}`);
           updateLocaleStorage(data);
-          navigate('/Admin');
+          const redirectPath = location.state?.path || '/Admin';
+          navigate(redirectPath, { replace: true });
           // resetForm();
         },
       }
@@ -61,7 +65,7 @@ export const useAuth = (props) => {
   const logout = () =>
     authMutation(
       {
-        method: 'POST',
+        method: 'GET',
         path: 'users/logout',
         data: '',
       },
@@ -76,7 +80,7 @@ export const useAuth = (props) => {
   const updateMyPassword = ({ passwordCurrent, password, passwordConfirm }) =>
     authMutation(
       {
-        method: 'POST',
+        method: 'PATCH',
         path: 'users/updateMyPassword',
         data: { passwordCurrent, password, passwordConfirm },
       },
@@ -86,7 +90,7 @@ export const useAuth = (props) => {
           updateLocaleStorage({
             token: data.token,
             tokenExpiration: data.tokenExpiration,
-            name: data.data.user.name,
+            name: data.user.name,
           });
         },
       }

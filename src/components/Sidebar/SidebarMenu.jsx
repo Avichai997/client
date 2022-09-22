@@ -43,6 +43,8 @@ const SidebarMenu = ({ route, showAnimation, isOpen, setIsOpen }) => {
   const params = useParams();
   const location = useLocation();
 
+  const { path, icon: Icon, name } = route;
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     setIsOpen(true);
@@ -64,7 +66,7 @@ const SidebarMenu = ({ route, showAnimation, isOpen, setIsOpen }) => {
     <>
       <div className='menu' onClick={toggleMenu}>
         <div className='menu_item'>
-          <div className='icon'>{route.icon}</div>
+          <Icon className='icon' />
           <AnimatePresence>
             {isOpen && (
               <motion.div
@@ -102,15 +104,11 @@ const SidebarMenu = ({ route, showAnimation, isOpen, setIsOpen }) => {
             exit='hidden'
             className='menu_container'
           >
-            {route.subRoutes.map((subRoute, i) => (
-              <motion.div
-                variants={menuItemAnimation}
-                key={subRoute.path}
-                custom={i}
-              >
-                <NavLink to={subRoute.path} key={i} className='link'>
-                  <div className='icon'>{subRoute.icon}</div>
-                  <motion.div className='link_text'>{subRoute.name}</motion.div>
+            {route.subRoutes.map(({ path, icon: Icon, name }, i) => (
+              <motion.div variants={menuItemAnimation} key={path} custom={i}>
+                <NavLink to={path} key={i} className='link'>
+                  <Icon className='icon' />
+                  <motion.div className='link_text'>{name}</motion.div>
                 </NavLink>
               </motion.div>
             ))}

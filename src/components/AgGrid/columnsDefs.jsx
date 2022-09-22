@@ -95,7 +95,7 @@ const getColumnsDefs = ({ page, customers, customersTypes }) => {
   };
 
   const ImageRenderer = (params) => {
-    const src = params.apiUrl ? params.apiUrl + params.value : params.value;
+    const src = params.apiUrl && params.value ? params.apiUrl + params.value : params.value;
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <Avatar alt='Cindy Baker' src={src} />

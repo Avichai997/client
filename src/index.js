@@ -3,12 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import './index.scss';
 import App from './App';
 import { ToastError } from 'components/Toasts';
 import axiosClient from 'utils/axiosClient';
+import './index.scss';
 
 const Minute = 60 * 1000;
 
@@ -22,20 +20,18 @@ const defaultQueryFn = async ({ queryKey: [path, params = ''] }) => {
   });
   return data;
 };
-// const defaultQueryFn = async ({ queryKey: [path, params = ''] }) => {
-//   const { data } = await axios.get(
-//     `${process.env.REACT_APP_API_URL}/api/${path}${params}`
-//   );
-//   return data;
-// };
-
 const defaultMutationFn = async ({ method, path, data }) => {
-  const { data: mutatedData } = await axios({
+  const token = JSON.parse(localStorage.getItem('user'))?.token;
+
+  const { data: mutatedData } = await axiosClient({
+    url: `/api/${path}`,
     method,
-    url: `${process.env.REACT_APP_API_URL}/api/${path}`,
     data,
-    // authorization
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
   });
+
   return mutatedData;
 };
 
@@ -55,12 +51,12 @@ const queryClient = new QueryClient({
     queries: {
       queryFn: defaultQueryFn,
       onError: queryErrorHandler,
-      // refetchOnReconnect: true, // on reconnect internet, defualt is True
-      // refetchOnWindowFocus: true,
+      refetchOnReconnect: false, // on reconnect internet, defualt is True
+      refetchOnWindowFocus: false,
       // refetchOnMount: false, // If true, the query will re-fetch on mount if the cached data is stale
       // refetchInterval: false, // refetch again after every millisecond
       staleTime: 5 * Minute, // 5 minutes default
-      cacheTime: Infinity, // 5 minutes default
+      cacheTime: 24 * 60 * Minute, // 5 minutes default
     },
     mutations: {
       mutationFn: defaultMutationFn,

@@ -12,13 +12,5 @@ export const useDashboards = (props) => {
     ...props?.options
   });
 
-  function setLoadStatus(dashboardId) {
-    // queryClient.setQueryData('dashboards', data => {
-    //   dashboardId
-    // })
-  }
-
-  
-
-  return { dashboards, setLoadStatus };
+  return { dashboards };
 };
