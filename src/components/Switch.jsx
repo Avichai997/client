@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { styled, FormControlLabel } from '@mui/material';
 import { default as muiSwitch } from '@mui/material/Switch';
+import { IconButton, Tooltip } from '@mui/material';
 
 const Android12Switch = styled(muiSwitch)(({ theme }) => ({
   padding: 8,
@@ -35,26 +36,35 @@ const Android12Switch = styled(muiSwitch)(({ theme }) => ({
   },
 }));
 
-const Switch = ({toggleFn}) => {
+const Switch = ({toggleFn }) => {
   const [isOn, setIsOn] = useState(false);
 
   return (
-    <FormControlLabel
-    onChange={() => {
-        setIsOn(!isOn);
-        toggleFn(!isOn)
-      }}
+    <Tooltip title='טען הכל'>
+    <IconButton
       sx={{
         position: 'absolute',
         bottom: '0px',
         right: '45px',
         zIndex: '1',
         height: 'var(--bottomNavHeight)',
+        width: '70px',
+      }}
+    >
+    <FormControlLabel
+      onChange={() => {
+        setIsOn(!isOn);
+        toggleFn(!isOn);
+      }}
+      sx={{
         margin: '0 !important',
       }}
       control={<Android12Switch defaultChecked={false} />}
       // label="טעינה אוטומטית"
     />
+    </IconButton>
+  </Tooltip>
+
   );
 };
 

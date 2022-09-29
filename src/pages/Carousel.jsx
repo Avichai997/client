@@ -16,10 +16,13 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import './Carousel.scss';
-import { TaskAlt } from '@mui/icons-material';
+import { AdminPanelSettings, TaskAlt } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Carousel = () => {
   const swiperRef = useRef();
+  const navigate = useNavigate();
 
   const { dashboards } = useDashboards({
     params: '?sort=order',
@@ -103,6 +106,15 @@ const Carousel = () => {
               </SwiperSlide>
             ))}
           </Swiper>
+
+          <Tooltip title='Admin Dashboard'>
+            <IconButton
+              className='carouselAdminBtn'
+              onClick={() => navigate('/Admin')}
+            >
+              <AdminPanelSettings />
+            </IconButton>
+          </Tooltip>
 
           <Switch toggleFn={changeLoadingStatus} />
 

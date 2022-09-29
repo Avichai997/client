@@ -1,3 +1,18 @@
+.carouselAdminBtn {
+  color: white !important;
+  position: absolute !important;
+  bottom: 0px;
+  right: 110px;
+  z-index: 2;
+  height: var(--bottomNavHeight);
+
+  &:hover {
+    background-color: rgba(41, 184, 255, 0.582) !important;
+    transition: 0.15s;
+  }
+
+}
+
 .swiper {
   color: white;
 
@@ -18,7 +33,7 @@
 
   &.swiperBottom {
     height: var(--bottomNavHeight);
-    width: calc(100% - 160px);
+    width: calc(100% - 200px);
     box-sizing: border-box;
     padding: 10px 0;
     position: absolute;
