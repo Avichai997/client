@@ -14,9 +14,9 @@ const defaultQueryFn = async ({ queryKey: [path, params = ''] }) => {
   const token = JSON.parse(localStorage.getItem('user'))?.token;
 
   const { data } = await axiosClient.get(`/api/${path}${params}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    // headers: {
+    //   Authorization: `Bearer ${token}`,
+    // },
   });
   return data;
 };
@@ -27,9 +27,9 @@ const defaultMutationFn = async ({ method, path, data }) => {
     url: `/api/${path}`,
     method,
     data,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }
+    // headers: {
+    //   Authorization: `Bearer ${token}`,
+    // }
   });
 
   return mutatedData;

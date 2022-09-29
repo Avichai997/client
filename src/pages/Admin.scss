@@ -7,6 +7,8 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+    flex-wrap: wrap;
+    overflow-x: auto;
 
     .screenContainer {
       padding: 20px;

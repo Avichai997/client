@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAuth } from 'hooks/useAuth';
+import axiosClient from 'utils/axiosClient';
 
 const getUser = async (user) => {
   if (!user) return null;
-  console.log(user)
+  console.log(user);
+
   const { data } = await axios.get(
     `${process.env.REACT_APP_API_URL}/api/users/${user.id || user._id}`,
     {
@@ -30,11 +32,17 @@ export const useUser = () => {
       updateLocaleStorage(data);
     },
     onError: (error) => {
-      console.log('no user')
+      console.log('no user');
     },
+  });
+
+  const { data: csrfToken } = useQuery(['users/csrfToken'], {
+    onSuccess: (data) =>
+      (axiosClient.defaults.headers.post['X-CSRF-Token'] = data.data.csrfToken),
   });
 
   return {
     user,
+    csrfToken,
   };
 };

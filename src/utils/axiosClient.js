@@ -1,10 +1,8 @@
 import axios from 'axios';
 
-const Minute = 60 * 1000;
-
 const axiosClient = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  // withCredentials: true, // Allow Cookies
+  withCredentials: true, // Allow Cookies
 });
 // axiosInterceptor.defaults.headers.common['Content-Type'] = 'application/json';
 // axiosClient.defaults.headers.Authorization = `Bearer ${user.token}`;

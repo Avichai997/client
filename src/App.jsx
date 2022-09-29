@@ -20,7 +20,7 @@ const Dashboard = Loadable(lazy(() => import('pages/Dashboard')));
 const Update = Loadable(lazy(() => import('pages/Update')));
 
 function App() {
-  const { user } = useUser();
+  const { user, csrfToken } = useUser();
 
   return (
     <>
