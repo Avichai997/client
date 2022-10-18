@@ -13,7 +13,7 @@ const Minute = 60 * 1000;
 const defaultQueryFn = async ({ queryKey: [path, params = ''] }) => {
   const token = JSON.parse(localStorage.getItem('user'))?.token;
 
-  const { data } = await axiosClient.get(`/api/${path}${params}`, {
+  const { data } = await axiosClient.get(`/api/${path}${params}`, { // /api/users?name=avichai
     // headers: {
     //   Authorization: `Bearer ${token}`,
     // },
@@ -56,7 +56,7 @@ const queryClient = new QueryClient({
       // refetchOnMount: false, // If true, the query will re-fetch on mount if the cached data is stale
       // refetchInterval: false, // refetch again after every millisecond
       staleTime: 5 * Minute, // 5 minutes default
-      cacheTime: 24 * 60 * Minute, // 5 minutes default
+      cacheTime: 24 * 60 * Minute, // = 1 day. 5 minutes default
     },
     mutations: {
       mutationFn: defaultMutationFn,
