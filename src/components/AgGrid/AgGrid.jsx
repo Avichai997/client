@@ -111,7 +111,7 @@ const AgGrid = () => {
       case 'types':
         if (!customersTypes) return;
         changePageData({
-          rowsData: customers,
+          rowsData: customersTypes,
           columnsDefs: {
             page,
             customersTypes,
@@ -133,7 +133,7 @@ const AgGrid = () => {
       default:
         break;
     }
-  }, [page, dashboards, customers, customersTypes, changePageData]);
+  }, [page, dashboards, customers, customersTypes, users, changePageData]);
 
   const localeText = useMemo(() => {
     return AG_GRID_LOCALE_HE;
@@ -153,6 +153,7 @@ const AgGrid = () => {
       const allDataFilled = columnsDefs.every((def) =>
         def.editable === false ? true : inputRow[def.field]
       );
+      
       if (allDataFilled) {
         setRowsData([...rowsData, inputRow]);
         setInputRow({});
@@ -331,7 +332,9 @@ const AgGrid = () => {
             options={customersTypes}
             limitTags={3}
           />
-        ) : <div/>}
+        ) : (
+          <div />
+        )}
 
         <Box sx={{ display: 'flex' }}>
           <SelectBox
