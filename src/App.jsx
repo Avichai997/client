@@ -1,12 +1,11 @@
 import { Suspense, lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Loading from 'components/Loading';
 import Carousel from 'pages/Carousel';
 import Login from 'pages/Login';
 import NoMatch from 'pages/NoMatch';
-import { useUser } from './hooks/useUser';
+import { useUser } from 'hooks/useUser';
 import ProtectRoute from 'components/ProtectRoute';
-import ProtectedRoute from 'components/ProtectRoute';
+import Loading from 'components/Loading';
 
 const Loadable = (Component) => (props) =>
   (
@@ -21,10 +20,10 @@ const Update = Loadable(lazy(() => import('pages/Update')));
 
 function App() {
   const { user, csrfToken } = useUser();
-
+  
   return (
     <>
-      <Loading />
+      <Loading/>
       <Routes>
         <Route path='/' element={<Carousel />} />
         <Route path='/Login' element={<Login />} />
